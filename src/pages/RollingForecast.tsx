@@ -425,12 +425,12 @@ const RollingForecast: React.FC = () => {
 
             {/* Rolling Forecast Header */}
             <div className="mb-4">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Rolling Forecast for 2025-2026</h2>
-              <div className="bg-blue-50 border-l-4 border-blue-600 text-blue-800 p-4 rounded-r-lg flex items-center gap-2">
-                <InfoIcon className="w-5 h-5" />
-                <div>
-                  <p className="font-bold">Instructions: Select a row to open monthly forecast forms</p>
-                  <p className="text-xs text-blue-700 mt-1">💡 Simplified layout shows months and forecast values for easy entry and forecast planning</p>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900">Rolling Forecast for 2025-2026</h2>
+                <div className="flex items-center gap-2">
+                  <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">
+                    Customer - Item
+                  </button>
                 </div>
               </div>
             </div>
