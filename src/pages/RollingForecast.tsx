@@ -45,15 +45,13 @@ interface ForecastItem {
   category: string;
   brand: string;
   itemCombined: string;
+  budget2025: number;
+  ytd2025: number;
   forecast2025: number;
-  actual2025: number;
-  forecast2026: number;
-  rate: number;
   stock: number;
   git: number;
-  forecastValue2026: number;
-  discount: number;
-  monthlyData: MonthlyForecast[];
+  eta: string;
+  monthlyUnits: { [monthIndex: number]: number };
 }
 
 const RollingForecast: React.FC = () => {
