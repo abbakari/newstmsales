@@ -927,16 +927,47 @@ const RollingForecast: React.FC = () => {
                                       <div className="flex gap-2">
                                         <button
                                           onClick={() => {
-                                            // Calculate and update totals
+                                            // Save forecast data to the main table
                                             const totals = calculateForecastTotals(row.id);
+
+                                            // Update the main table data with forecast values
+                                            setTableData(prev => prev.map(item =>
+                                              item.id === row.id ? {
+                                                ...item,
+                                                forecast2025: totals.budget2026,
+                                                budget2025: item.budget2025 + totals.budget2024
+                                              } : item
+                                            ));
+
+                                            // Save to localStorage for persistence
+                                            const forecastToSave = {
+                                              customerId: row.id,
+                                              customer: row.customer,
+                                              item: row.item,
+                                              forecastData: forecastData[row.id],
+                                              totals: totals,
+                                              savedAt: new Date().toISOString()
+                                            };
+
+                                            const savedForecasts = JSON.parse(localStorage.getItem('savedForecasts') || '[]');
+                                            const updatedForecasts = savedForecasts.filter((f: any) => f.customerId !== row.id);
+                                            updatedForecasts.push(forecastToSave);
+                                            localStorage.setItem('savedForecasts', JSON.stringify(updatedForecasts));
+
                                             const dynamicTotals = calculateDynamicTotals();
                                             showNotification(
-                                              `Forecast saved! Total Budget 2026: ${totals.budget2026} units. Overall Forecast: ${dynamicTotals.totalForecastUnits} units`,
+                                              `✅ Forecast saved successfully! ${row.customer}: ${totals.budget2026} units forecasted`,
                                               'success'
                                             );
+
+                                            // Close the forecast table after saving
+                                            setTimeout(() => {
+                                              handleToggleForecastTable(row.id);
+                                            }, 1000);
                                           }}
-                                          className="bg-green-600 text-white px-4 py-2 rounded-md text-xs hover:bg-green-700 transition-colors"
+                                          className="bg-green-600 text-white px-4 py-2 rounded-md text-xs hover:bg-green-700 transition-colors flex items-center gap-2"
                                         >
+                                          <Save className="w-3 h-3" />
                                           Save Forecast
                                         </button>
                                         <button
