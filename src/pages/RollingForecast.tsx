@@ -560,27 +560,51 @@ const RollingForecast: React.FC = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="bg-white p-3 rounded-lg shadow-sm border-2 border-yellow-400">
-                <div className="flex flex-col gap-1">
-                  <button
-                    onClick={() => setIsForecastModalOpen(true)}
-                    className="bg-green-600 text-white font-semibold px-2 py-1 rounded-md text-xs flex items-center gap-1 hover:bg-green-700 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md"
-                    title="Create new rolling forecast"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>New Forecast</span>
-                  </button>
-                  <button
-                    onClick={() => showNotification('Analytics feature coming soon', 'success')}
-                    className="bg-blue-100 text-blue-800 font-semibold px-2 py-1 rounded-md text-xs flex items-center gap-1 hover:bg-blue-200 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md"
-                    title="View forecast analytics"
-                  >
-                    <BarChart3 className="w-4 h-4" />
-                    <span>Analytics</span>
-                  </button>
+              {/* Notes Section */}
+              <div className="bg-yellow-50 p-3 rounded-lg shadow-sm border-2 border-yellow-400">
+                <div className="text-xs">
+                  <div className="font-semibold text-orange-600 mb-1">Notes:</div>
+                  <div className="text-gray-700">ACT 2025 = ACT + Future Forecast</div>
+                  <div className="text-xs text-gray-500 mt-1">(Active forecast without Budget)</div>
+                  <div className="flex items-center gap-1 mt-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-xs text-gray-600">Sales Without Budget</span>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Action Buttons Row */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              <button
+                onClick={() => showNotification('New Addition feature opened', 'success')}
+                className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                New Addition
+              </button>
+
+              <button
+                onClick={() => {
+                  // Toggle forecast view
+                  showNotification('Showing items with 2025 forecast', 'success');
+                }}
+                className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+              >
+                With 2025 Forecast
+              </button>
+
+              <button
+                onClick={() => {
+                  // Toggle forecast view
+                  showNotification('Showing items without 2025 forecast', 'success');
+                }}
+                className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+              >
+                Without 2025 Forecast
+              </button>
+
+              <div></div> {/* Empty space */}
             </div>
 
             {/* Summary Cards Row */}
