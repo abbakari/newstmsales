@@ -613,12 +613,12 @@ const RollingForecast: React.FC = () => {
                             />
                           </td>
                           <td className="p-3 border-r border-gray-200 text-xs">
-                            <div className="text-gray-900 font-medium">
+                            <div className="text-gray-900 font-medium whitespace-nowrap">
                               {row.customer}
                             </div>
                           </td>
                           <td className="p-3 border-r border-gray-200 text-xs">
-                            <div className="text-gray-900" title={row.item}>
+                            <div className="text-gray-900 whitespace-nowrap" title={row.item}>
                               {row.item}
                             </div>
                           </td>
