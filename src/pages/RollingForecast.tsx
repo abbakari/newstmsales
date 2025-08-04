@@ -563,6 +563,15 @@ const RollingForecast: React.FC = () => {
                   <table className="w-full bg-white border-collapse text-xs">
                     <thead className="bg-gray-50">
                       <tr className="border-b border-gray-200">
+                        <th className="w-10 p-3 text-center border-r border-gray-200">
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4 accent-blue-600 rounded"
+                            checked={tableData.length > 0 && tableData.every(item => item.selected)}
+                            onChange={handleSelectAll}
+                            title="Select all"
+                          />
+                        </th>
                         <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           Customer
                         </th>
@@ -591,7 +600,16 @@ const RollingForecast: React.FC = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {tableData.map((row, rowIndex) => (
-                        <tr key={row.id} className="hover:bg-gray-50">
+                        <tr key={row.id} className={`hover:bg-gray-50 ${row.selected ? 'bg-blue-50' : ''}`}>
+                          <td className="p-3 border-r border-gray-200 text-center">
+                            <input
+                              type="checkbox"
+                              className="w-4 h-4 accent-blue-600 rounded"
+                              checked={row.selected}
+                              onChange={() => handleSelectRow(row.id)}
+                              title="Select this row"
+                            />
+                          </td>
                           <td className="p-3 border-r border-gray-200 text-xs">
                             <div className="text-gray-900 font-medium">
                               {row.customer}
