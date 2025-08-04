@@ -280,34 +280,7 @@ const RollingForecast: React.FC = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gray-100 font-sans">
-        {/* Header Section */}
-        <div className="bg-gray-900 text-white p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-orange-500 px-3 py-1 rounded font-bold text-sm">SUPERDOLL</div>
-              <h1 className="text-lg font-semibold">Sales Budgeting & Rolling Forecast</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <Search className="w-5 h-5" />
-              <Bell className="w-5 h-5" />
-              <div className="bg-gray-700 px-3 py-1 rounded text-sm">MARIAM SHAYO</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Navigation */}
-        <div className="bg-white border-b border-gray-200 px-4 py-2">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Home className="w-4 h-4" />
-              <span>Dashboards</span>
-            </div>
-            <ChevronDown className="w-4 h-4 text-gray-400" />
-            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-              Rolling Forecast
-            </div>
-          </div>
-        </div>
 
         {/* Main Content Container */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 m-4 overflow-hidden">
