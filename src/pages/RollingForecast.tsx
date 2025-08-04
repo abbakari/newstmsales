@@ -1,368 +1,308 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { Search, Download, Filter, Calendar, TrendingUp, BarChart3, Target, AlertCircle, Plus, Users, DollarSign, ShoppingCart, Eye, Edit, Trash2, X, Upload } from 'lucide-react';
+import { 
+  Search, 
+  Download, 
+  Filter, 
+  Calendar, 
+  TrendingUp, 
+  BarChart3, 
+  Target, 
+  AlertCircle, 
+  Plus, 
+  Users, 
+  DollarSign, 
+  ShoppingCart, 
+  Eye, 
+  Edit, 
+  Trash2, 
+  X, 
+  Upload,
+  Bell,
+  ChevronDown,
+  RotateCcw,
+  Info as InfoIcon,
+  Download as DownloadIcon,
+  PieChart,
+  MoreVertical,
+  Check,
+  ChevronUp,
+  Truck,
+  Home,
+  Grid,
+  Minus,
+  Save
+} from 'lucide-react';
 import CustomerForecastModal from '../components/CustomerForecastModal';
-import AdvancedCustomerTable from '../components/AdvancedCustomerTable';
-import CustomerAnalyticsModal from '../components/CustomerAnalyticsModal';
-import ExcelLikeCustomerTable from '../components/ExcelLikeCustomerTable';
-import { Customer, Item, CustomerItemForecast, ForecastFormData, MonthlyForecast, BudgetHistory, YearlyForecastSummary, FilterOptions } from '../types/forecast';
-import { getBudgetImpactAnalysis, formatCurrency, formatPercentage, getVarianceColor, getConfidenceColor, getRemainingMonths, generateBudgetHistory, generateYearlyForecastSummary, getAvailableYears } from '../utils/budgetCalculations';
-import { exportForecastData, downloadImportTemplate, ExportData } from '../utils/exportUtils';
-import { budgetDataIntegration } from '../utils/budgetDataIntegration';
+import { Customer, Item, CustomerItemForecast, ForecastFormData, MonthlyForecast } from '../types/forecast';
+import { formatCurrency, formatPercentage } from '../utils/budgetCalculations';
+
+interface ForecastItem {
+  id: number;
+  selected: boolean;
+  customer: string;
+  item: string;
+  category: string;
+  brand: string;
+  itemCombined: string;
+  forecast2025: number;
+  actual2025: number;
+  forecast2026: number;
+  rate: number;
+  stock: number;
+  git: number;
+  forecastValue2026: number;
+  discount: number;
+  monthlyData: MonthlyForecast[];
+}
 
 const RollingForecast: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('customer-forecast');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
-  const [selectedPeriod, setSelectedPeriod] = useState('2025');
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedCustomer, setSelectedCustomer] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [selectedItem, setSelectedItem] = useState('');
+  const [selectedYear2025, setSelectedYear2025] = useState('2025');
+  const [selectedYear2026, setSelectedYear2026] = useState('2026');
+  const [activeView, setActiveView] = useState('forecast-planning');
+  const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
+  const [editingRowId, setEditingRowId] = useState<number | null>(null);
 
   // Modal states
   const [isForecastModalOpen, setIsForecastModalOpen] = useState(false);
-  const [isAnalyticsModalOpen, setIsAnalyticsModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [editingForecast, setEditingForecast] = useState<CustomerItemForecast | null>(null);
-
-  // Data states
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [items, setItems] = useState<Item[]>([]);
-  const [customerForecasts, setCustomerForecasts] = useState<CustomerItemForecast[]>([]);
-  const [budgetHistory, setBudgetHistory] = useState<BudgetHistory[]>([]);
-  const [yearlyForecastSummary, setYearlyForecastSummary] = useState<YearlyForecastSummary | null>(null);
-
-  // Filter states
-  const [filters, setFilters] = useState<{
-    regions: string[];
-    segments: string[];
-    categories: string[];
-    confidence: string[];
-  }>({ regions: [], segments: [], categories: [], confidence: [] });
-
-  // Toast notification state
+  
+  // Notification state
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
-  // Sample data - in real app this would come from API
-  useEffect(() => {
-    // Initialize sample customers
-    const sampleCustomers: Customer[] = [
-      {
-        id: '1',
-        name: 'Acme Corporation',
-        code: 'ACME001',
-        email: 'orders@acme.com',
-        phone: '+1-555-0101',
-        region: 'North America',
-        segment: 'Enterprise',
-        creditLimit: 500000,
-        currency: 'USD',
-        active: true,
-        createdAt: '2024-01-15',
-        lastActivity: '2024-12-01',
-        channels: ['Direct Sales', 'Online'],
-        seasonality: 'medium',
-        tier: 'platinum',
-        manager: 'John Smith'
-      },
-      {
-        id: '2',
-        name: 'Global Tech Solutions',
-        code: 'GTS002',
-        email: 'procurement@globaltech.com',
-        phone: '+1-555-0102',
-        region: 'North America',
-        segment: 'SMB',
-        creditLimit: 250000,
-        currency: 'USD',
-        active: true,
-        createdAt: '2024-02-20',
-        lastActivity: '2024-11-28',
-        channels: ['Retail Partners', 'Distributors'],
-        seasonality: 'high',
-        tier: 'gold',
-        manager: 'Sarah Johnson'
-      },
-      {
-        id: '3',
-        name: 'European Systems Ltd',
-        code: 'ESL003',
-        email: 'orders@eusystems.eu',
-        phone: '+44-20-7946-0958',
-        region: 'Europe',
-        segment: 'Enterprise',
-        creditLimit: 750000,
-        currency: 'EUR',
-        active: true,
-        createdAt: '2024-03-10',
-        lastActivity: '2024-12-02',
-        channels: ['Direct Sales', 'Online', 'Retail Partners'],
-        seasonality: 'low',
-        tier: 'platinum',
-        manager: 'Michael Brown'
-      },
-      {
-        id: '4',
-        name: 'Asia Pacific Trading',
-        code: 'APT004',
-        email: 'info@aptrading.com',
-        phone: '+65-6123-4567',
-        region: 'Asia Pacific',
-        segment: 'SMB',
-        creditLimit: 300000,
-        currency: 'SGD',
-        active: true,
-        createdAt: '2024-04-05',
-        lastActivity: '2024-11-30',
-        channels: ['Online', 'Distributors'],
-        seasonality: 'medium',
-        tier: 'silver',
-        manager: 'Lisa Chen'
-      }
-    ];
+  // GIT explanation state
+  const [showGitExplanation, setShowGitExplanation] = useState(false);
 
-    // Initialize sample items
-    const sampleItems: Item[] = [
-      {
-        id: '1',
-        sku: 'IPH15P-256',
-        name: 'iPhone 15 Pro 256GB',
-        category: 'Smartphones',
-        brand: 'Apple',
-        unitPrice: 999.00,
-        costPrice: 750.00,
-        currency: 'USD',
-        unit: 'piece',
-        active: true,
-        description: 'Latest iPhone with Pro features',
-        seasonal: false,
-        minOrderQuantity: 1,
-        leadTime: 7,
-        supplier: 'Apple Inc.'
-      },
-      {
-        id: '2',
-        sku: 'SGS24-128',
-        name: 'Samsung Galaxy S24 128GB',
-        category: 'Smartphones',
-        brand: 'Samsung',
-        unitPrice: 849.00,
-        costPrice: 650.00,
-        currency: 'USD',
-        unit: 'piece',
-        active: true,
-        description: 'Premium Android smartphone',
-        seasonal: false,
-        minOrderQuantity: 1,
-        leadTime: 5,
-        supplier: 'Samsung Electronics'
-      },
-      {
-        id: '3',
-        sku: 'MBA-M3-512',
-        name: 'MacBook Air M3 512GB',
-        category: 'Laptops',
-        brand: 'Apple',
-        unitPrice: 1299.00,
-        costPrice: 950.00,
-        currency: 'USD',
-        unit: 'piece',
-        active: true,
-        description: 'Ultra-thin laptop with M3 chip',
-        seasonal: false,
-        minOrderQuantity: 1,
-        leadTime: 10,
-        supplier: 'Apple Inc.'
-      },
-      {
-        id: '4',
-        sku: 'DXP13-1TB',
-        name: 'Dell XPS 13 1TB',
-        category: 'Laptops',
-        brand: 'Dell',
-        unitPrice: 1199.00,
-        costPrice: 900.00,
-        currency: 'USD',
-        unit: 'piece',
-        active: true,
-        description: 'Premium ultrabook for professionals',
-        seasonal: false,
-        minOrderQuantity: 1,
-        leadTime: 8,
-        supplier: 'Dell Technologies'
-      },
-      {
-        id: '5',
-        sku: 'SWH1000X5',
-        name: 'Sony WH-1000XM5 Headphones',
-        category: 'Audio',
-        brand: 'Sony',
-        unitPrice: 399.00,
-        costPrice: 250.00,
-        currency: 'USD',
-        unit: 'piece',
-        active: true,
-        description: 'Premium noise-canceling headphones',
-        seasonal: true,
-        seasonalMonths: ['Nov', 'Dec', 'Jan'],
-        minOrderQuantity: 5,
-        leadTime: 3,
-        supplier: 'Sony Corporation'
-      }
-    ];
+  // Monthly editing state
+  const [editingMonthlyData, setEditingMonthlyData] = useState<{[key: number]: MonthlyForecast[]}>({});
 
-    setCustomers(sampleCustomers);
-    setItems(sampleItems);
+  // Generate all months for the year
+  const getAllYearMonths = () => {
+    const currentDate = new Date();
+    const months = [];
 
-    // Initialize budget history
-    const history = generateBudgetHistory();
-    setBudgetHistory(history);
-  }, []);
-
-  // Update yearly forecast summary when data changes
-  useEffect(() => {
-    const summary = generateYearlyForecastSummary(customerForecasts, customers, selectedYear);
-    setYearlyForecastSummary(summary);
-  }, [customerForecasts, customers, selectedYear]);
-
-  // Calculate summary data from forecasts
-  const budgetAnalysis = getBudgetImpactAnalysis(customerForecasts, selectedYear);
-
-  const summaryData = [
-    {
-      title: 'Total Forecast',
-      value: formatCurrency(budgetAnalysis.summary.totalForecast),
-      change: formatPercentage(budgetAnalysis.summary.overallVariancePercentage),
-      isPositive: budgetAnalysis.summary.overallVariance >= 0,
-      icon: TrendingUp,
-      color: 'primary' as const
-    },
-    {
-      title: 'Active Customers',
-      value: customers.filter(c => c.active).length.toString(),
-      change: `${customerForecasts.length} forecasts`,
-      isPositive: true,
-      icon: Users,
-      color: 'success' as const
-    },
-    {
-      title: 'Budget Variance',
-      value: formatCurrency(Math.abs(budgetAnalysis.summary.overallVariance)),
-      change: budgetAnalysis.summary.overallVariance >= 0 ? 'Over Budget' : 'Under Budget',
-      isPositive: budgetAnalysis.summary.overallVariance < 0,
-      icon: Target,
-      color: 'info' as const
-    },
-    {
-      title: 'Remaining Months',
-      value: getRemainingMonths().length.toString(),
-      change: `${new Date().getFullYear()} Forecast`,
-      isPositive: true,
-      icon: Calendar,
-      color: 'warning' as const
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(currentDate.getFullYear(), i, 1);
+      months.push({
+        short: date.toLocaleDateString('en-US', { month: 'short' }),
+        full: date.toLocaleDateString('en-US', { month: 'long' }),
+        index: i
+      });
     }
-  ];
-
-  const tabs = [
-    { id: 'customer-forecast', label: 'Customer Forecasts', active: true },
-    { id: 'customer-table', label: 'Customer Management', active: false },
-    { id: 'budget-impact', label: 'Budget Impact', active: false },
-    { id: 'budget-history', label: 'Budget History', active: false },
-    { id: 'forecast-summary', label: 'Forecast Summary', active: false }
-  ];
-
-  const handleCustomerSelect = (customerId: string) => {
-    setSelectedCustomerId(customerId);
-    const customer = customers.find(c => c.id === customerId);
-    setSelectedCustomer(customer || null);
+    return months;
   };
 
-  const handleCreateForecast = (customer: Customer) => {
-    setSelectedCustomer(customer);
-    setEditingForecast(null);
-    setIsForecastModalOpen(true);
-  };
+  const months = getAllYearMonths();
 
-  const handleEditForecast = (forecast: CustomerItemForecast) => {
-    setSelectedCustomer(forecast.customer);
-    setEditingForecast(forecast);
-    setIsForecastModalOpen(true);
-  };
-
-  const handleDeleteForecast = (forecastId: string) => {
-    if (confirm('Are you sure you want to delete this forecast?')) {
-      setCustomerForecasts(prev => prev.filter(f => f.id !== forecastId));
-      showNotification('Forecast deleted successfully', 'success');
-    }
-  };
-
-  const handleUpdateCustomer = (updatedCustomer: Customer) => {
-    setCustomers(prev => prev.map(customer =>
-      customer.id === updatedCustomer.id ? updatedCustomer : customer
-    ));
-    showNotification('Customer updated successfully', 'success');
-  };
-
-  const handleViewCustomerAnalytics = (customer: Customer) => {
-    setSelectedCustomer(customer);
-    setIsAnalyticsModalOpen(true);
-    showNotification(`Opening analytics for ${customer.name}`, 'success');
-  };
-
-  const handleSaveForecast = (forecastData: ForecastFormData) => {
-    const customer = customers.find(c => c.id === forecastData.customerId);
-    const item = items.find(i => i.id === forecastData.itemId);
-
-    if (!customer || !item) {
-      showNotification('Invalid customer or item selected', 'error');
-      return;
-    }
-
-    // Convert forecast data to monthly forecasts
-    const monthlyForecasts: MonthlyForecast[] = Object.entries(forecastData.forecasts)
-      .filter(([_, data]) => data.quantity > 0 || data.unitPrice > 0)
-      .map(([month, data]) => ({
-        month,
+  // Sample forecast data
+  const initialData: ForecastItem[] = [
+    {
+      id: 1,
+      selected: false,
+      customer: "Action Aid International (Tz)",
+      item: "BF GOODRICH TYRE 235/85R16 120/116S TL AT/TA KO2 LRERWLGO",
+      category: "Tyres",
+      brand: "BF Goodrich",
+      itemCombined: "BF GOODRICH TYRE 235/85R16 (Tyres - BF Goodrich)",
+      forecast2025: 1200000,
+      actual2025: 850000,
+      forecast2026: 0,
+      rate: 341,
+      stock: 232,
+      git: 0,
+      forecastValue2026: 0,
+      discount: 0,
+      monthlyData: months.map(month => ({
+        month: month.short,
         year: new Date().getFullYear(),
-        monthIndex: getRemainingMonths().indexOf(month),
-        quantity: data.quantity,
-        unitPrice: data.unitPrice,
-        totalValue: data.quantity * data.unitPrice,
-        notes: data.notes
+        monthIndex: month.index,
+        quantity: 0,
+        unitPrice: 341,
+        totalValue: 0,
+        notes: ''
+      }))
+    },
+    {
+      id: 2,
+      selected: false,
+      customer: "Action Aid International (Tz)",
+      item: "BF GOODRICH TYRE 265/65R17 120/117S TL AT/TA KO2 LRERWLGO",
+      category: "Tyres",
+      brand: "BF Goodrich",
+      itemCombined: "BF GOODRICH TYRE 265/65R17 (Tyres - BF Goodrich)",
+      forecast2025: 980000,
+      actual2025: 720000,
+      forecast2026: 0,
+      rate: 412,
+      stock: 7,
+      git: 0,
+      forecastValue2026: 0,
+      discount: 0,
+      monthlyData: months.map(month => ({
+        month: month.short,
+        year: new Date().getFullYear(),
+        monthIndex: month.index,
+        quantity: 0,
+        unitPrice: 412,
+        totalValue: 0,
+        notes: ''
+      }))
+    },
+    {
+      id: 3,
+      selected: false,
+      customer: "European Systems Ltd",
+      item: "MICHELIN TYRE 265/65R17 112T TL LTX TRAIL",
+      category: "Tyres",
+      brand: "Michelin",
+      itemCombined: "MICHELIN TYRE 265/65R17 (Tyres - Michelin)",
+      forecast2025: 875000,
+      actual2025: 920000,
+      forecast2026: 0,
+      rate: 300,
+      stock: 127,
+      git: 0,
+      forecastValue2026: 0,
+      discount: 0,
+      monthlyData: months.map(month => ({
+        month: month.short,
+        year: new Date().getFullYear(),
+        monthIndex: month.index,
+        quantity: 0,
+        unitPrice: 300,
+        totalValue: 0,
+        notes: ''
+      }))
+    },
+    {
+      id: 4,
+      selected: false,
+      customer: "Asia Pacific Trading",
+      item: "VALVE 0214 TR 414J FOR CAR TUBELESS TYRE",
+      category: "Accessories",
+      brand: "Generic",
+      itemCombined: "VALVE 0214 TR 414J (Accessories - Generic)",
+      forecast2025: 15000,
+      actual2025: 18000,
+      forecast2026: 0,
+      rate: 0.5,
+      stock: 2207,
+      git: 0,
+      forecastValue2026: 0,
+      discount: 0,
+      monthlyData: months.map(month => ({
+        month: month.short,
+        year: new Date().getFullYear(),
+        monthIndex: month.index,
+        quantity: 0,
+        unitPrice: 0.5,
+        totalValue: 0,
+        notes: ''
+      }))
+    }
+  ];
+
+  const [originalTableData, setOriginalTableData] = useState<ForecastItem[]>(initialData);
+  const [tableData, setTableData] = useState<ForecastItem[]>(initialData);
+
+  // Save forecast data to localStorage
+  useEffect(() => {
+    localStorage.setItem('rollingForecastData', JSON.stringify(tableData));
+  }, [tableData]);
+
+  // Apply filters
+  useEffect(() => {
+    const filteredData = originalTableData.filter(item => {
+      const matchesCustomer = !selectedCustomer || item.customer.toLowerCase().includes(selectedCustomer.toLowerCase());
+      const matchesCategory = !selectedCategory || item.category.toLowerCase().includes(selectedCategory.toLowerCase());
+      const matchesBrand = !selectedBrand || item.brand.toLowerCase().includes(selectedBrand.toLowerCase());
+      const matchesItem = !selectedItem || item.item.toLowerCase().includes(selectedItem.toLowerCase());
+      return matchesCustomer && matchesCategory && matchesBrand && matchesItem;
+    });
+    setTableData(filteredData);
+  }, [selectedCustomer, selectedCategory, selectedBrand, selectedItem, originalTableData]);
+
+  const handleSelectRow = (id: number) => {
+    setTableData(prev => prev.map(item => {
+      if (item.id === id) {
+        const newSelected = !item.selected;
+        if (newSelected) {
+          showNotification(`Selected: ${item.customer} - ${item.item}`, 'success');
+        }
+        return { ...item, selected: newSelected };
+      }
+      return item;
+    }));
+  };
+
+  const handleSelectAll = () => {
+    const allSelected = tableData.every(item => item.selected);
+    const newState = !allSelected;
+    setTableData(prev => prev.map(item => ({ ...item, selected: newState })));
+    showNotification(newState ? `Selected all ${tableData.length} items` : 'Deselected all items', 'success');
+  };
+
+  const handleEditMonthlyData = (rowId: number) => {
+    const row = tableData.find(item => item.id === rowId);
+    if (row) {
+      setEditingRowId(rowId);
+      setEditingMonthlyData({
+        [rowId]: [...row.monthlyData]
+      });
+    }
+  };
+
+  const handleMonthlyDataChange = (rowId: number, monthIndex: number, field: keyof MonthlyForecast, value: number | string) => {
+    setEditingMonthlyData(prev => ({
+      ...prev,
+      [rowId]: prev[rowId]?.map((month, index) => 
+        index === monthIndex ? { ...month, [field]: value } : month
+      ) || []
+    }));
+  };
+
+  const handleSaveMonthlyData = (rowId: number) => {
+    const monthlyData = editingMonthlyData[rowId];
+    if (monthlyData) {
+      const forecastValue2026 = monthlyData.reduce((sum, month) => sum + month.totalValue, 0);
+      const totalQuantity = monthlyData.reduce((sum, month) => sum + month.quantity, 0);
+
+      // Update monthly data with calculated total values
+      const updatedMonthlyData = monthlyData.map(month => ({
+        ...month,
+        totalValue: month.quantity * month.unitPrice
       }));
 
-    const yearlyTotal = monthlyForecasts.reduce((sum, mf) => sum + mf.totalValue, 0);
+      setTableData(prev => prev.map(item =>
+        item.id === rowId ? {
+          ...item,
+          monthlyData: updatedMonthlyData,
+          forecast2026: totalQuantity,
+          forecastValue2026: forecastValue2026
+        } : item
+      ));
 
-    const monthlyBudgetImpact: { [month: string]: number } = {};
-    monthlyForecasts.forEach(mf => {
-      monthlyBudgetImpact[mf.month] = mf.totalValue;
-    });
+      setEditingRowId(null);
+      setEditingMonthlyData(prev => {
+        const newData = { ...prev };
+        delete newData[rowId];
+        return newData;
+      });
 
-    const newForecast: CustomerItemForecast = {
-      id: editingForecast?.id || `forecast_${Date.now()}`,
-      customerId: customer.id,
-      itemId: item.id,
-      customer,
-      item,
-      monthlyForecasts,
-      yearlyTotal,
-      yearlyBudgetImpact: yearlyTotal,
-      monthlyBudgetImpact,
-      createdAt: editingForecast?.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: 'current_user',
-      status: 'draft',
-      confidence: forecastData.confidence,
-      notes: forecastData.notes
-    };
-
-    if (editingForecast) {
-      // Update existing forecast
-      setCustomerForecasts(prev => prev.map(f => f.id === editingForecast.id ? newForecast : f));
-      showNotification('Forecast updated successfully', 'success');
-    } else {
-      // Add new forecast
-      setCustomerForecasts(prev => [...prev, newForecast]);
-      showNotification('Forecast created successfully', 'success');
+      showNotification(`Monthly forecast data saved for row ${rowId}`, 'success');
     }
+  };
+
+  const handleCancelMonthlyEdit = (rowId: number) => {
+    setEditingRowId(null);
+    setEditingMonthlyData(prev => {
+      const newData = { ...prev };
+      delete newData[rowId];
+      return newData;
+    });
   };
 
   const showNotification = (message: string, type: 'success' | 'error') => {
@@ -370,858 +310,691 @@ const RollingForecast: React.FC = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const getFilteredCustomers = () => {
-    let filteredCustomers = customers;
+  const handleDownloadForecast = () => {
+    const fileName = `rolling_forecast_${selectedYear2026}.csv`;
+    showNotification(`Preparing download for ${selectedYear2026}...`, 'success');
 
-    // Apply search term filter
-    if (searchTerm) {
-      filteredCustomers = filteredCustomers.filter(customer =>
-        customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.segment.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+    // Prepare export data
+    const exportData = tableData.map(item => ({
+      customer: item.customer,
+      item: item.item,
+      category: item.category,
+      brand: item.brand,
+      [`forecast_${selectedYear2025}`]: item.forecast2025,
+      [`actual_${selectedYear2025}`]: item.actual2025,
+      [`forecast_${selectedYear2026}`]: item.forecast2026,
+      rate: item.rate,
+      stock: item.stock,
+      git: item.git,
+      forecastValue2026: item.forecastValue2026,
+      discount: item.discount
+    }));
 
-    // Apply selected customer filter
-    if (selectedCustomerId) {
-      filteredCustomers = filteredCustomers.filter(customer => customer.id === selectedCustomerId);
-    }
+    // Convert to CSV
+    const csvHeaders = Object.keys(exportData[0] || {}).join(',');
+    const csvRows = exportData.map(row =>
+      Object.values(row).map(value =>
+        typeof value === 'string' ? `"${value}"` : value
+      ).join(',')
+    );
+    const downloadContent = [csvHeaders, ...csvRows].join('\n');
 
-    // Apply additional filters
-    if (filters.regions.length > 0) {
-      filteredCustomers = filteredCustomers.filter(customer =>
-        filters.regions.includes(customer.region)
-      );
-    }
+    // Create and trigger download
+    const blob = new Blob([downloadContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 
-    if (filters.segments.length > 0) {
-      filteredCustomers = filteredCustomers.filter(customer =>
-        filters.segments.includes(customer.segment)
-      );
-    }
-
-    return filteredCustomers;
+    showNotification(`Download completed: ${fileName}`, 'success');
   };
 
-  const getCustomerForecasts = (customerId?: string) => {
-    if (customerId) {
-      return customerForecasts.filter(f => f.customerId === customerId);
-    }
-    return customerForecasts;
-  };
-
-  const getCustomerForecastSummary = (customerId: string) => {
-    const forecasts = getCustomerForecasts(customerId);
-    const totalValue = forecasts.reduce((sum, f) => sum + f.yearlyTotal, 0);
-    const totalItems = forecasts.length;
-    return { totalValue, totalItems };
-  };
-
-  const handleExportData = (format: 'csv' | 'json' | 'budget-csv' = 'csv') => {
-    try {
-      const exportData: ExportData = {
-        customers,
-        forecasts: customerForecasts,
-        budgetAnalysis
-      };
-
-      exportForecastData(exportData, format);
-      showNotification(`Export started in ${format.toUpperCase()} format`, 'success');
-    } catch (error) {
-      showNotification('Export failed. Please try again.', 'error');
-    }
-  };
-
-  const handleDownloadTemplate = () => {
-    downloadImportTemplate();
-    showNotification('Import template downloaded', 'success');
-  };
+  // Calculate totals
+  const totalForecast2025 = tableData.reduce((sum, item) => sum + item.forecast2025, 0);
+  const totalActual2025 = tableData.reduce((sum, item) => sum + item.actual2025, 0);
+  const totalForecast2026 = tableData.reduce((sum, item) => sum + item.forecastValue2026, 0);
+  const totalUnits2025 = tableData.reduce((sum, item) => sum + Math.floor(item.forecast2025 / (item.rate || 1)), 0);
+  const totalUnits2026 = tableData.reduce((sum, item) => sum + item.forecast2026, 0);
+  const forecastGrowth = totalForecast2025 > 0 ? ((totalForecast2026 - totalForecast2025) / totalForecast2025) * 100 : 0;
 
   return (
     <Layout>
-      <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h4 className="text-2xl font-bold text-gray-900 mb-2">
-            <span className="text-gray-500 font-light">Rolling Forecast /</span> Customer Management
-          </h4>
-          <p className="text-gray-600 text-sm">Create and manage customer-specific forecasts for remaining months of {new Date().getFullYear()}</p>
-        </div>
-        <div className="flex space-x-2">
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {getAvailableYears().map(year => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-          <div className="relative group">
-            <button
-              onClick={() => {
-                // Load budget data and convert to forecasts
-                const savedBudgetData = localStorage.getItem('salesBudgetData');
-                if (savedBudgetData) {
-                  try {
-                    const budgetData = JSON.parse(savedBudgetData);
-                    budgetDataIntegration.setBudgetData(budgetData);
-                    const forecastData = budgetDataIntegration.convertToForecastData();
-                    setCustomerForecasts(prev => [...prev, ...forecastData]);
-                    showNotification(`Imported ${forecastData.length} forecasts from budget data`, 'success');
-                  } catch (error) {
-                    showNotification('Failed to import budget data', 'error');
-                  }
-                } else {
-                  showNotification('No budget data found to import', 'error');
-                }
-              }}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-            >
-              <Upload className="w-4 h-4" />
-              <span>Import from Budget</span>
-            </button>
-            <button
-              onClick={() => handleExportData('csv')}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span>Export CSV</span>
-            </button>
-            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-              <button
-                onClick={() => handleExportData('json')}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-              >
-                Export JSON
-              </button>
-              <button
-                onClick={() => handleExportData('budget-csv')}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-              >
-                Export Budget Analysis
-              </button>
-              <button
-                onClick={handleDownloadTemplate}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-              >
-                Download Template
-              </button>
+      <div className="min-h-screen bg-gray-100 font-sans">
+        {/* Header Section */}
+        <div className="bg-gray-900 text-white p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-orange-500 px-3 py-1 rounded font-bold text-sm">SUPERDOLL</div>
+              <h1 className="text-lg font-semibold">Sales Budgeting & Rolling Forecast</h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <Search className="w-5 h-5" />
+              <Bell className="w-5 h-5" />
+              <div className="bg-gray-700 px-3 py-1 rounded text-sm">MARIAM SHAYO</div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {summaryData.map((item, index) => {
-          const IconComponent = item.icon;
-          return (
-            <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className={`flex-shrink-0 p-3 rounded-lg ${
-                  item.color === 'primary' ? 'bg-blue-100' :
-                  item.color === 'success' ? 'bg-green-100' :
-                  item.color === 'info' ? 'bg-purple-100' :
-                  item.color === 'warning' ? 'bg-yellow-100' : 'bg-gray-100'
-                }`}>
-                  <IconComponent className={`w-6 h-6 ${
-                    item.color === 'primary' ? 'text-blue-600' :
-                    item.color === 'success' ? 'text-green-600' :
-                    item.color === 'info' ? 'text-purple-600' :
-                    item.color === 'warning' ? 'text-yellow-600' : 'text-gray-600'
-                  }`} />
+        {/* Navigation */}
+        <div className="bg-white border-b border-gray-200 px-4 py-2">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Home className="w-4 h-4" />
+              <span>Dashboards</span>
+            </div>
+            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+              Rolling Forecast
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Container */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 m-4 overflow-hidden">
+          {/* Stats Cards Row */}
+          <div className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              {/* Stock Card */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+                <div className="bg-green-200 p-3 rounded-full">
+                  <TrendingUp className="w-7 h-7 text-green-600" />
                 </div>
-                <div className="ml-4 flex-1">
-                  <p className="text-sm font-medium text-gray-600">{item.title}</p>
-                  <div className="flex items-baseline">
-                    <p className="text-2xl font-semibold text-gray-900">{item.value}</p>
-                    <p className={`ml-2 text-sm font-medium ${
-                      item.isPositive ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {item.change}
-                    </p>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Stock</p>
+                  <p className="text-xl font-bold text-green-600">
+                    {tableData.reduce((sum, item) => sum + item.stock, 0).toLocaleString()} units
+                  </p>
+                </div>
+              </div>
+
+              {/* GIT Card */}
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3 relative">
+                <div className="bg-red-200 p-3 rounded-full">
+                  <Truck className="w-7 h-7 text-red-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-gray-600">GIT (Good In Transit)</p>
+                    <button
+                      onClick={() => setShowGitExplanation(!showGitExplanation)}
+                      className="text-red-600 hover:text-red-800 transition-colors"
+                    >
+                      <InfoIcon className="w-4 h-4" />
+                    </button>
                   </div>
+                  <p className="text-xl font-bold text-red-600">
+                    {tableData.reduce((sum, item) => sum + item.git, 0).toLocaleString()} units
+                  </p>
+                  {showGitExplanation && (
+                    <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-white border border-red-200 rounded-lg shadow-lg z-10">
+                      <p className="text-xs text-gray-700">
+                        <strong>GIT (Good In Transit):</strong> Items that have been shipped from suppliers
+                        but haven't yet arrived at our warehouse. These are considered inventory assets
+                        but are not available for immediate sale.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Download Button */}
+              <div className="flex items-center justify-end">
+                <button
+                  onClick={handleDownloadForecast}
+                  className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors transform hover:scale-105 active:scale-95"
+                  title="View Rolling Forecast Report"
+                >
+                  <Eye className="w-5 h-5" />
+                  <span>View Rolling Forecast Report</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Rolling Forecast Header */}
+            <div className="mb-4">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Rolling Forecast for 2025-2026</h2>
+              <div className="bg-blue-50 border-l-4 border-blue-600 text-blue-800 p-4 rounded-r-lg flex items-center gap-2">
+                <InfoIcon className="w-5 h-5" />
+                <div>
+                  <p className="font-bold">Instructions: Select a row to open monthly forecast forms</p>
+                  <p className="text-xs text-blue-700 mt-1">💡 Simplified layout shows months and forecast values for easy entry and forecast planning</p>
                 </div>
               </div>
             </div>
-          );
-        })}
-      </div>
 
-      {/* Search and Controls */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Search Customers</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Search customers, codes, or regions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Select Customer</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={selectedCustomerId}
-              onChange={(e) => handleCustomerSelect(e.target.value)}
-            >
-              <option value="">All Customers</option>
-              {customers.map(customer => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name} ({customer.code})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Forecast Year</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-            >
-              <option value="2025">2025</option>
-              <option value="2024">2024</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Action Summary */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">{customerForecasts.length}</span> active forecasts
-            </div>
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">{customers.filter(c => c.active).length}</span> active customers
-            </div>
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">{getRemainingMonths().length}</span> months remaining in {new Date().getFullYear()}
-            </div>
-          </div>
-          <div className="text-sm text-gray-600">
-            Last updated: {new Date().toLocaleString()}
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200 p-0">
-          <ul className="flex" role="tablist">
-            {tabs.map((tab) => (
-              <li key={tab.id} className="flex-1" role="presentation">
-                <button
-                  className={`w-full px-4 py-3 text-sm font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
-                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setActiveTab(tab.id)}
-                  type="button"
-                  role="tab"
+            {/* Filters Row */}
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+              {/* Customer Filter */}
+              <div className={`bg-white p-3 rounded-lg shadow-sm border-2 transition-all duration-200 ${
+                selectedCustomer ? 'border-blue-400 bg-blue-50' : 'border-yellow-400'
+              }`}>
+                <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
+                  👤 CUSTOMER:
+                  {selectedCustomer && <span className="text-blue-600">✓</span>}
+                </label>
+                <select
+                  className="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                  value={selectedCustomer}
+                  onChange={(e) => {
+                    setSelectedCustomer(e.target.value);
+                    if (e.target.value) showNotification(`Filtered by customer: ${e.target.value}`, 'success');
+                  }}
                 >
-                  {tab.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+                  <option value="">Select customer</option>
+                  <option value="Action Aid International (Tz)">Action Aid International (Tz)</option>
+                  <option value="European Systems Ltd">European Systems Ltd</option>
+                  <option value="Asia Pacific Trading">Asia Pacific Trading</option>
+                </select>
+              </div>
 
-        {/* Tab Content */}
-        <div className="p-6">
-          {activeTab === 'customer-forecast' && (
-            <div className="space-y-6">
-              {/* Header Actions */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Customer Forecasts</h3>
-                  <p className="text-sm text-gray-600">Manage forecasts for all customers</p>
+              {/* Category Filter */}
+              <div className={`bg-white p-3 rounded-lg shadow-sm border-2 transition-all duration-200 ${
+                selectedCategory ? 'border-green-400 bg-green-50' : 'border-yellow-400'
+              }`}>
+                <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
+                  📦 CATEGORY:
+                  {selectedCategory && <span className="text-green-600">✓</span>}
+                </label>
+                <select
+                  className="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    if (e.target.value) showNotification(`Filtered by category: ${e.target.value}`, 'success');
+                  }}
+                >
+                  <option value="">Select category</option>
+                  <option value="Tyres">Tyres</option>
+                  <option value="Accessories">Accessories</option>
+                </select>
+              </div>
+
+              {/* Brand Filter */}
+              <div className={`bg-white p-3 rounded-lg shadow-sm border-2 transition-all duration-200 ${
+                selectedBrand ? 'border-purple-400 bg-purple-50' : 'border-yellow-400'
+              }`}>
+                <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
+                  🏷️ BRAND:
+                  {selectedBrand && <span className="text-purple-600">✓</span>}
+                </label>
+                <select
+                  className="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                  value={selectedBrand}
+                  onChange={(e) => {
+                    setSelectedBrand(e.target.value);
+                    if (e.target.value) showNotification(`Filtered by brand: ${e.target.value}`, 'success');
+                  }}
+                >
+                  <option value="">Select brand</option>
+                  <option value="BF Goodrich">BF Goodrich</option>
+                  <option value="Michelin">Michelin</option>
+                  <option value="Generic">Generic</option>
+                </select>
+              </div>
+
+              {/* Item Filter */}
+              <div className={`bg-white p-3 rounded-lg shadow-sm border-2 transition-all duration-200 ${
+                selectedItem ? 'border-orange-400 bg-orange-50' : 'border-yellow-400'
+              }`}>
+                <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
+                  🔧 ITEM:
+                  {selectedItem && <span className="text-orange-600">✓</span>}
+                </label>
+                <select
+                  className="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors"
+                  value={selectedItem}
+                  onChange={(e) => {
+                    setSelectedItem(e.target.value);
+                    if (e.target.value) showNotification(`Filtered by item: ${e.target.value}`, 'success');
+                  }}
+                >
+                  <option value="">Select item</option>
+                  <option value="BF GOODRICH TYRE 235/85R16">BF GOODRICH TYRE 235/85R16</option>
+                  <option value="BF GOODRICH TYRE 265/65R17">BF GOODRICH TYRE 265/65R17</option>
+                  <option value="VALVE 0214 TR 414J">VALVE 0214 TR 414J</option>
+                  <option value="MICHELIN TYRE 265/65R17">MICHELIN TYRE 265/65R17</option>
+                </select>
+              </div>
+
+              {/* Year Selectors */}
+              <div className="bg-white p-3 rounded-lg shadow-sm border-2 border-indigo-400">
+                <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
+                  📅 YEARS:
+                </label>
+                <div className="flex gap-1">
+                  <select
+                    className="w-full text-xs p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                    value={selectedYear2025}
+                    onChange={(e) => {
+                      setSelectedYear2025(e.target.value);
+                      showNotification(`Changed base year to ${e.target.value}`, 'success');
+                    }}
+                  >
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                  </select>
+                  <select
+                    className="w-full text-xs p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                    value={selectedYear2026}
+                    onChange={(e) => {
+                      setSelectedYear2026(e.target.value);
+                      showNotification(`Changed target year to ${e.target.value}`, 'success');
+                    }}
+                  >
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                  </select>
                 </div>
-                <div className="flex gap-3">
-                  <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
-                    <Filter className="w-4 h-4" />
-                    Filter
-                  </button>
-                  <button className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition-colors flex items-center gap-2">
-                    <Download className="w-4 h-4" />
-                    Export
-                  </button>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="bg-white p-3 rounded-lg shadow-sm border-2 border-yellow-400">
+                <div className="flex flex-col gap-1">
                   <button
                     onClick={() => setIsForecastModalOpen(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    className="bg-green-600 text-white font-semibold px-2 py-1 rounded-md text-xs flex items-center gap-1 hover:bg-green-700 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md"
+                    title="Create new rolling forecast"
                   >
                     <Plus className="w-4 h-4" />
-                    New Forecast
+                    <span>New Forecast</span>
+                  </button>
+                  <button
+                    onClick={() => showNotification('Analytics feature coming soon', 'success')}
+                    className="bg-blue-100 text-blue-800 font-semibold px-2 py-1 rounded-md text-xs flex items-center gap-1 hover:bg-blue-200 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md"
+                    title="View forecast analytics"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    <span>Analytics</span>
                   </button>
                 </div>
               </div>
+            </div>
 
-              {/* Customer Table */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+            {/* Stats Grid - Real-time Forecast Statistics */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+              <div className="bg-white p-2 rounded shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md">
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-600 font-medium">Forecast {selectedYear2025}</p>
+                  <p className="text-lg font-bold text-blue-900 transition-colors duration-300">${totalForecast2025.toLocaleString()}</p>
+                  <p className="text-xs text-blue-600 font-medium">
+                    {totalUnits2025.toLocaleString()} Units
+                  </p>
+                </div>
+              </div>
+              <div className="bg-white p-2 rounded shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md">
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-600 font-medium">Actual {selectedYear2025}</p>
+                  <p className="text-lg font-bold text-green-900 transition-colors duration-300">${totalActual2025.toLocaleString()}</p>
+                  <p className="text-xs text-green-600 font-medium">
+                    {Math.floor(totalActual2025 / (tableData[0]?.rate || 1)).toLocaleString()} Units
+                  </p>
+                </div>
+              </div>
+              <div className={`p-2 rounded shadow-sm border-2 transition-all duration-500 hover:shadow-lg ${
+                totalForecast2026 > 0
+                  ? 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-300 shadow-purple-100'
+                  : 'bg-white border-gray-200'
+              }`}>
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-600 font-medium">Forecast {selectedYear2026}</p>
+                  <p className={`text-lg font-bold transition-all duration-500 ${
+                    totalForecast2026 > 0 ? 'text-purple-900 scale-105' : 'text-gray-500'
+                  }`}>${totalForecast2026.toLocaleString()}</p>
+                  <p className={`text-xs font-medium transition-colors duration-500 ${
+                    totalForecast2026 > 0 ? 'text-purple-600' : 'text-gray-400'
+                  }`}>
+                    {totalUnits2026.toLocaleString()} Units
+                  </p>
+                  {totalForecast2026 > 0 && (
+                    <div className="mt-1">
+                      <span className="inline-block px-1.5 py-0.5 bg-purple-200 text-purple-800 text-xs rounded-full font-medium animate-pulse">
+                        📈 Updated
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className={`p-2 rounded shadow-sm border-2 transition-all duration-500 hover:shadow-lg ${
+                forecastGrowth > 0
+                  ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-300'
+                  : forecastGrowth < 0
+                    ? 'bg-gradient-to-br from-red-50 to-red-100 border-red-300'
+                    : 'bg-white border-gray-200'
+              }`}>
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-600 font-medium">Forecast Growth (%)</p>
+                  <p className={`text-lg font-bold transition-all duration-500 flex items-center gap-1 ${
+                    forecastGrowth > 0
+                      ? 'text-green-900'
+                      : forecastGrowth < 0
+                        ? 'text-red-900'
+                        : 'text-gray-500'
+                  }`}>
+                    {forecastGrowth > 0 && '📈'}
+                    {forecastGrowth < 0 && '📉'}
+                    {forecastGrowth === 0 && '➡️'}
+                    {forecastGrowth.toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-gray-600">From {selectedYear2025} to {selectedYear2026}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Data Table */}
+            <div className="relative">
+              {tableData.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 border border-gray-300 rounded-lg bg-white">
+                  <p className="text-lg">No data available with current filters</p>
+                  <p className="text-sm">Try adjusting your filter criteria or clear the filters</p>
+                  <button
+                    onClick={() => {
+                      setSelectedCustomer('');
+                      setSelectedCategory('');
+                      setSelectedBrand('');
+                      setSelectedItem('');
+                      showNotification('All filters cleared', 'success');
+                    }}
+                    className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
+              ) : (
+                <div className="max-h-[600px] border border-gray-300 rounded-lg overflow-y-auto">
+                  <table className="w-full bg-white border-collapse table-fixed">
+                    {/* Sticky Header */}
+                    <thead className="bg-gray-50 sticky top-0 z-10">
                       <tr>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Segment</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Forecasts</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Forecast</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="w-12 p-2 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-200">
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4 accent-blue-600"
+                            checked={tableData.every(item => item.selected)}
+                            onChange={handleSelectAll}
+                          />
+                        </th>
+                        <th className="w-32 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-200">
+                          Customer
+                        </th>
+                        <th className="w-40 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-200">
+                          Item (Category - Brand)
+                        </th>
+                        <th className="w-20 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                          FORECAST {selectedYear2025}
+                        </th>
+                        <th className="w-20 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                          ACTUAL {selectedYear2025}
+                        </th>
+                        <th className="w-20 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-blue-50">
+                          FORECAST {selectedYear2026}
+                        </th>
+                        <th className="w-16 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                          RATE
+                        </th>
+                        <th className="w-14 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                          STK
+                        </th>
+                        <th className="w-14 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                          GIT
+                        </th>
+                        <th className="w-24 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                          FORECAST {selectedYear2026} Value
+                        </th>
+                        <th className="w-20 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {getFilteredCustomers().map((customer, index) => {
-                        const forecasts = getCustomerForecasts(customer.id);
-                        const summary = getCustomerForecastSummary(customer.id);
 
-                        return (
-                          <tr key={customer.id} className={`hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                  <Users className="w-4 h-4 text-blue-600" />
+                    <tbody>
+                      {tableData.map(row => (
+                        <React.Fragment key={row.id}>
+                          <tr className={`hover:bg-gray-50 ${row.selected ? 'bg-blue-50' : ''}`}>
+                            <td className="p-2 border-b border-r border-gray-200">
+                              <input
+                                type="checkbox"
+                                className="w-4 h-4 accent-blue-600"
+                                checked={row.selected}
+                                onChange={() => handleSelectRow(row.id)}
+                              />
+                            </td>
+                            <td className="p-2 border-b border-r border-gray-200 text-xs">
+                              <div className="truncate" title={row.customer}>
+                                {row.customer}
+                              </div>
+                            </td>
+                            <td className="p-2 border-b border-r border-gray-200 text-xs">
+                              <div className="truncate" title={row.item}>
+                                <div className="font-medium text-gray-900 truncate">
+                                  {row.item}
                                 </div>
-                                <div>
-                                  <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                                  <div className="text-xs text-gray-500">ID: {customer.id}</div>
+                                <div className="text-xs text-gray-500 truncate">
+                                  {row.category} - {row.brand}
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="text-sm font-mono text-gray-900">{customer.code}</span>
+                            <td className="p-2 border-b border-gray-200 text-xs">
+                              ${(row.forecast2025/1000).toFixed(0)}k
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                customer.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                              }`}>
-                                {customer.active ? 'Active' : 'Inactive'}
-                              </span>
+                            <td className="p-2 border-b border-gray-200 text-xs">
+                              ${(row.actual2025/1000).toFixed(0)}k
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {customer.region}
+                            <td className="p-2 border-b border-gray-200 bg-blue-50 text-xs">
+                              <input
+                                type="number"
+                                className="w-full p-1 text-center border border-gray-300 rounded text-xs"
+                                value={row.forecast2026}
+                                onChange={(e) => {
+                                  const value = parseInt(e.target.value) || 0;
+                                  setTableData(prev => prev.map(item =>
+                                    item.id === row.id ? { ...item, forecast2026: value } : item
+                                  ));
+                                }}
+                              />
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {customer.segment}
+                            <td className="p-2 border-b border-gray-200 text-xs">
+                              {row.rate}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {summary.totalItems}
-                              </span>
+                            <td className="p-2 border-b border-gray-200 text-xs">
+                              {row.stock}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                              {formatCurrency(summary.totalValue)}
+                            <td className="p-2 border-b border-gray-200 text-xs">
+                              {row.git}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="truncate max-w-[150px]" title={customer.email}>
-                                {customer.email}
-                              </div>
+                            <td className="p-2 border-b border-gray-200 text-xs">
+                              ${(row.forecastValue2026/1000).toFixed(0)}k
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <div className="flex items-center space-x-2">
-                                <button
-                                  onClick={() => handleCreateForecast(customer)}
-                                  className="bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-1 text-xs"
-                                  title="Create New Forecast"
-                                >
-                                  <Plus className="w-3 h-3" />
-                                  New
-                                </button>
-                                {forecasts.length > 0 && (
+                            <td className="p-2 border-b border-gray-200 text-xs">
+                              <div className="flex gap-1">
+                                {editingRowId === row.id ? (
+                                  <>
+                                    <button
+                                      onClick={() => handleSaveMonthlyData(row.id)}
+                                      className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors"
+                                      title="Save monthly data"
+                                    >
+                                      <Save className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleCancelMonthlyEdit(row.id)}
+                                      className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors"
+                                      title="Cancel edit"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </>
+                                ) : (
                                   <button
-                                    onClick={() => setSelectedCustomerId(customer.id)}
-                                    className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-1 text-xs"
-                                    title="View Details"
+                                    onClick={() => handleEditMonthlyData(row.id)}
+                                    className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition-colors"
+                                    title="Edit monthly forecast"
                                   >
-                                    <Eye className="w-3 h-3" />
-                                    View
+                                    <Calendar className="w-3 h-3" />
                                   </button>
                                 )}
-                                <button
-                                  onClick={() => handleViewCustomerAnalytics(customer)}
-                                  className="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-md hover:bg-purple-200 transition-colors flex items-center gap-1 text-xs"
-                                  title="Analytics"
-                                >
-                                  <BarChart3 className="w-3 h-3" />
-                                  Stats
-                                </button>
                               </div>
                             </td>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
 
-                {/* Empty State */}
-                {getFilteredCustomers().length === 0 && (
-                  <div className="text-center py-12">
-                    <Users className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No customers found</h3>
-                    <p className="mt-1 text-sm text-gray-500">Get started by creating a new forecast.</p>
-                    <div className="mt-6">
-                      <button
-                        onClick={() => setIsForecastModalOpen(true)}
-                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        New Forecast
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+                          {/* Monthly Data Entry Row */}
+                          {editingRowId === row.id && (
+                            <tr className="bg-gray-50">
+                              <td colSpan={11} className="p-4 border-b border-gray-200">
+                                <div className="bg-white rounded-lg p-4 border">
+                                  <div className="mb-4">
+                                    <h4 className="text-lg font-semibold flex items-center gap-2">
+                                      <Calendar className="w-5 h-5" />
+                                      Monthly Forecast Data for {selectedYear2026}
+                                    </h4>
+                                    <p className="text-sm text-gray-600 mt-1">Enter forecast quantities and pricing for each month</p>
+                                  </div>
 
-              {/* Selected Customer Forecasts */}
-              {selectedCustomerId && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="p-6 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        Forecasts for {customers.find(c => c.id === selectedCustomerId)?.name}
-                      </h3>
-                      <button
-                        onClick={() => setSelectedCustomerId('')}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
+                                  {/* 2-Row Horizontal Table */}
+                                  <div className="overflow-x-auto">
+                                    <table className="w-full min-w-[800px] border border-gray-300 rounded-lg">
+                                      <thead>
+                                        <tr className="bg-gray-100">
+                                          <th className="p-3 text-left text-sm font-semibold text-gray-700 border-r border-gray-300 min-w-[80px]">Month</th>
+                                          {editingMonthlyData[row.id]?.map((month, monthIndex) => (
+                                            <th key={monthIndex} className="p-3 text-center text-sm font-semibold text-gray-700 border-r border-gray-300 min-w-[80px]">
+                                              {month.month}
+                                            </th>
+                                          )) || []}
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr className="bg-white">
+                                          <td className="p-3 font-medium text-gray-800 border-r border-gray-300 bg-gray-50">Quantity</td>
+                                          {editingMonthlyData[row.id]?.map((month, monthIndex) => (
+                                            <td key={monthIndex} className="p-2 border-r border-gray-300">
+                                              <input
+                                                type="number"
+                                                className="w-full p-2 text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                value={month.quantity}
+                                                onChange={(e) => handleMonthlyDataChange(
+                                                  row.id,
+                                                  monthIndex,
+                                                  'quantity',
+                                                  parseInt(e.target.value) || 0
+                                                )}
+                                                placeholder="0"
+                                              />
+                                            </td>
+                                          )) || []}
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                          <td className="p-3 font-medium text-gray-800 border-r border-gray-300 bg-gray-50">Unit Price</td>
+                                          {editingMonthlyData[row.id]?.map((month, monthIndex) => (
+                                            <td key={monthIndex} className="p-2 border-r border-gray-300">
+                                              <input
+                                                type="number"
+                                                step="0.01"
+                                                className="w-full p-2 text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                value={month.unitPrice}
+                                                onChange={(e) => handleMonthlyDataChange(
+                                                  row.id,
+                                                  monthIndex,
+                                                  'unitPrice',
+                                                  parseFloat(e.target.value) || 0
+                                                )}
+                                                placeholder="0.00"
+                                              />
+                                            </td>
+                                          )) || []}
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
 
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Forecast</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {getCustomerForecasts(selectedCustomerId).map(forecast => (
-                          <tr key={forecast.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">{forecast.item.name}</div>
-                                <div className="text-sm text-gray-500">{forecast.item.category}</div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {forecast.item.sku}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {formatCurrency(forecast.yearlyTotal)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getConfidenceColor(forecast.confidence)}`}>
-                                {forecast.confidence}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                forecast.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                forecast.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                                forecast.status === 'revised' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}>
-                                {forecast.status}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                              <button
-                                onClick={() => handleEditForecast(forecast)}
-                                className="text-blue-600 hover:text-blue-900"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteForecast(forecast.id)}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                        {getCustomerForecasts(selectedCustomerId).length === 0 && (
-                          <tr>
-                            <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                              No forecasts found for this customer.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+                                  {/* Summary Stats */}
+                                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-200 mt-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                                      <div>
+                                        <div className="text-sm text-blue-600 font-medium">Total Quantity</div>
+                                        <div className="text-lg font-bold text-blue-800">
+                                          {editingMonthlyData[row.id]?.reduce((sum, month) => sum + month.quantity, 0).toLocaleString() || 0}
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <div className="text-sm text-green-600 font-medium">Total Value</div>
+                                        <div className="text-lg font-bold text-green-800">
+                                          ${editingMonthlyData[row.id]?.reduce((sum, month) => sum + (month.quantity * month.unitPrice), 0).toLocaleString() || 0}
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <div className="text-sm text-purple-600 font-medium">Avg/Month</div>
+                                        <div className="text-lg font-bold text-purple-800">
+                                          {Math.round((editingMonthlyData[row.id]?.reduce((sum, month) => sum + month.quantity, 0) || 0) / 12).toLocaleString()}
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <div className="text-sm text-orange-600 font-medium">Avg Price</div>
+                                        <div className="text-lg font-bold text-orange-800">
+                                          ${((editingMonthlyData[row.id]?.reduce((sum, month) => sum + month.unitPrice, 0) || 0) / 12).toFixed(2)}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
 
-          {activeTab === 'customer-table' && (
-            <div className="space-y-6">
-              <AdvancedCustomerTable
-                customers={customers}
-                items={items}
-                customerForecasts={customerForecasts}
-                onUpdateCustomer={handleUpdateCustomer}
-                onCreateForecast={handleCreateForecast}
-                onViewCustomerDetails={handleViewCustomerAnalytics}
-                selectedYear={selectedYear}
-              />
-            </div>
-          )}
-
-          {activeTab === 'budget-impact' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget Impact Analysis</h3>
-
-                {/* Yearly Summary */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="bg-blue-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-blue-900">Total Budget</p>
-                        <p className="text-xl font-semibold text-blue-800">{formatCurrency(budgetAnalysis.yearly.originalBudget)}</p>
-                      </div>
-                      <DollarSign className="w-8 h-8 text-blue-600" />
-                    </div>
-                  </div>
-                  <div className="bg-green-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-green-900">Total Forecast</p>
-                        <p className="text-xl font-semibold text-green-800">{formatCurrency(budgetAnalysis.yearly.forecastImpact)}</p>
-                      </div>
-                      <TrendingUp className="w-8 h-8 text-green-600" />
-                    </div>
-                  </div>
-                  <div className={`rounded-lg p-4 ${
-                    budgetAnalysis.yearly.variance >= 0 ? 'bg-red-50' : 'bg-green-50'
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className={`text-sm font-medium ${
-                          budgetAnalysis.yearly.variance >= 0 ? 'text-red-900' : 'text-green-900'
-                        }`}>Variance</p>
-                        <p className={`text-xl font-semibold ${
-                          budgetAnalysis.yearly.variance >= 0 ? 'text-red-800' : 'text-green-800'
-                        }`}>{formatPercentage(budgetAnalysis.yearly.variancePercentage)}</p>
-                      </div>
-                      <AlertCircle className={`w-8 h-8 ${
-                        budgetAnalysis.yearly.variance >= 0 ? 'text-red-600' : 'text-green-600'
-                      }`} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Monthly Budget Impact */}
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget Target</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Forecast</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variance</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% Variance</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {budgetAnalysis.monthly.map(impact => (
-                        <tr key={impact.month} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {impact.month} {impact.year}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {formatCurrency(impact.originalBudget)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {formatCurrency(impact.forecastImpact)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getVarianceColor(impact.variance)}`}>
-                              {formatCurrency(Math.abs(impact.variance))}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getVarianceColor(impact.variance)}`}>
-                              {formatPercentage(impact.variancePercentage)}
-                            </span>
-                          </td>
-                        </tr>
+                                  <div className="mt-4 flex justify-between items-center">
+                                    <div className="text-sm text-gray-600">
+                                      <strong>Total Forecast Value:</strong> ${editingMonthlyData[row.id]?.reduce((sum, month) => sum + (month.quantity * month.unitPrice), 0).toLocaleString() || 0}
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => handleSaveMonthlyData(row.id)}
+                                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors flex items-center gap-2"
+                                      >
+                                        <Save className="w-4 h-4" />
+                                        Save & Apply
+                                      </button>
+                                      <button
+                                        onClick={() => handleCancelMonthlyEdit(row.id)}
+                                        className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center gap-2"
+                                      >
+                                        <X className="w-4 h-4" />
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>
                 </div>
-              </div>
+              )}
             </div>
-          )}
-
-          {activeTab === 'budget-history' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget History (2021 - {new Date().getFullYear()})</h3>
-
-                {/* Historical Overview */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                  {budgetHistory.map(history => (
-                    <div key={history.year} className="bg-gray-50 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-gray-900">{history.year}</h4>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          history.status === 'completed' ? 'bg-green-100 text-green-800' :
-                          history.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {history.status}
-                        </span>
-                      </div>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Budget:</span>
-                          <span className="font-medium">{formatCurrency(history.totalBudget)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Actual:</span>
-                          <span className="font-medium">{formatCurrency(history.actualSpent)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Variance:</span>
-                          <span className={`font-medium ${
-                            history.variance >= 0 ? 'text-red-600' : 'text-green-600'
-                          }`}>
-                            {formatPercentage(history.variancePercentage)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Accuracy:</span>
-                          <span className="font-medium">{history.forecastAccuracy.toFixed(1)}%</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Detailed Year Selection */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Year for Detailed View
-                  </label>
-                  <select
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {budgetHistory.map(history => (
-                      <option key={history.year} value={history.year}>{history.year}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Monthly Details for Selected Year */}
-                {(() => {
-                  const selectedYearData = budgetHistory.find(h => h.year === selectedYear);
-                  if (!selectedYearData) return null;
-
-                  return (
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget Target</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actual Spent</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Forecast</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variance</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {Object.entries(selectedYearData.monthlyData).map(([month, data]) => {
-                            const variance = data.actual - data.budget;
-                            const variancePercentage = data.budget !== 0 ? (variance / data.budget) * 100 : 0;
-
-                            return (
-                              <tr key={month} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                  {month} {selectedYear}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                  {formatCurrency(data.budget)}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                  {formatCurrency(data.actual)}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                  {formatCurrency(data.forecast)}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getVarianceColor(variance)}`}>
-                                    {formatPercentage(variancePercentage)}
-                                  </span>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'forecast-summary' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Forecast Summary</h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm font-medium text-gray-600">Total Customers</p>
-                    <p className="text-2xl font-semibold text-gray-900">{customers.length}</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm font-medium text-gray-600">Active Forecasts</p>
-                    <p className="text-2xl font-semibold text-gray-900">{customerForecasts.length}</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm font-medium text-gray-600">Items Forecasted</p>
-                    <p className="text-2xl font-semibold text-gray-900">{new Set(customerForecasts.map(f => f.itemId)).size}</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm font-medium text-gray-600">Avg Confidence</p>
-                    <p className="text-2xl font-semibold text-gray-900">
-                      {customerForecasts.length > 0 ?
-                        Math.round(customerForecasts.reduce((sum, f) =>
-                          sum + (f.confidence === 'high' ? 3 : f.confidence === 'medium' ? 2 : 1), 0
-                        ) / customerForecasts.length * 33.33) : 0}%
-                    </p>
-                  </div>
-                </div>
-
-                {/* Customer Summary Table */}
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Forecasts</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Value</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {customers.map(customer => {
-                        const forecasts = getCustomerForecasts(customer.id);
-                        const summary = getCustomerForecastSummary(customer.id);
-                        const lastForecast = forecasts.sort((a, b) =>
-                          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-                        )[0];
-
-                        return (
-                          <tr key={customer.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                                <div className="text-sm text-gray-500">{customer.code}</div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {customer.region}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {summary.totalItems}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {formatCurrency(summary.totalValue)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {lastForecast ? new Date(lastForecast.updatedAt).toLocaleDateString() : 'No forecasts'}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
-      </div>
 
-      {/* Notification Toast */}
-      {notification && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ${
-          notification.type === 'success'
-            ? 'bg-green-600 text-white'
-            : 'bg-red-600 text-white'
-        }`}>
-          {notification.message}
-        </div>
-      )}
+        {/* Notification Toast */}
+        {notification && (
+          <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ${
+            notification.type === 'success'
+              ? 'bg-green-600 text-white'
+              : 'bg-red-600 text-white'
+          }`}>
+            {notification.message}
+          </div>
+        )}
 
-      {/* Customer Forecast Modal */}
-      <CustomerForecastModal
-        isOpen={isForecastModalOpen}
-        onClose={() => {
-          setIsForecastModalOpen(false);
-          setSelectedCustomer(null);
-          setEditingForecast(null);
-        }}
-        customer={selectedCustomer}
-        items={items}
-        onSaveForecast={handleSaveForecast}
-        existingForecast={editingForecast ? {
-          customerId: editingForecast.customerId,
-          itemId: editingForecast.itemId,
-          forecasts: editingForecast.monthlyForecasts.reduce((acc, mf) => {
-            acc[mf.month] = {
-              quantity: mf.quantity,
-              unitPrice: mf.unitPrice,
-              notes: mf.notes
-            };
-            return acc;
-          }, {} as { [month: string]: { quantity: number; unitPrice: number; notes?: string } }),
-          confidence: editingForecast.confidence,
-          notes: editingForecast.notes
-        } : null}
-      />
-
-      {/* Customer Analytics Modal */}
-      <CustomerAnalyticsModal
-        isOpen={isAnalyticsModalOpen}
-        onClose={() => {
-          setIsAnalyticsModalOpen(false);
-          setSelectedCustomer(null);
-        }}
-        customer={selectedCustomer}
-        customerForecasts={customerForecasts}
-      />
+        {/* Customer Forecast Modal */}
+        <CustomerForecastModal
+          isOpen={isForecastModalOpen}
+          onClose={() => setIsForecastModalOpen(false)}
+          customer={null}
+          items={[]}
+          onSaveForecast={() => {}}
+          existingForecast={null}
+        />
       </div>
     </Layout>
   );
