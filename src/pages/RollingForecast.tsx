@@ -474,7 +474,7 @@ const RollingForecast: React.FC = () => {
                 selectedItem ? 'border-orange-400 bg-orange-50' : 'border-yellow-400'
               }`}>
                 <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
-                  🔧 ITEM:
+                  �� ITEM:
                   {selectedItem && <span className="text-orange-600">✓</span>}
                 </label>
                 <select
@@ -547,73 +547,27 @@ const RollingForecast: React.FC = () => {
               </div>
             </div>
 
-            {/* Stats Grid - Real-time Forecast Statistics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-              <div className="bg-white p-2 rounded shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md">
-                <div className="flex flex-col gap-1">
-                  <p className="text-xs text-gray-600 font-medium">Forecast {selectedYear2025}</p>
-                  <p className="text-lg font-bold text-blue-900 transition-colors duration-300">${totalForecast2025.toLocaleString()}</p>
-                  <p className="text-xs text-blue-600 font-medium">
-                    {totalUnits2025.toLocaleString()} Units
-                  </p>
-                </div>
+            {/* Summary Cards Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              {/* Budget 2025 */}
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="text-sm text-gray-600 mb-1">Budget 2025</div>
+                <div className="text-2xl font-bold text-blue-600">${(totalBudget2025/1000000).toFixed(2)}M</div>
+                <div className="text-xs text-gray-500">{(totalBudget2025/1000).toLocaleString()} Units</div>
               </div>
-              <div className="bg-white p-2 rounded shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md">
-                <div className="flex flex-col gap-1">
-                  <p className="text-xs text-gray-600 font-medium">Actual {selectedYear2025}</p>
-                  <p className="text-lg font-bold text-green-900 transition-colors duration-300">${totalActual2025.toLocaleString()}</p>
-                  <p className="text-xs text-green-600 font-medium">
-                    {Math.floor(totalActual2025 / (tableData[0]?.rate || 1)).toLocaleString()} Units
-                  </p>
-                </div>
+
+              {/* Sales 2025 */}
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="text-sm text-gray-600 mb-1">Sales 2025</div>
+                <div className="text-2xl font-bold text-green-600">${(totalYTD2025/1000).toFixed(0)}K</div>
+                <div className="text-xs text-gray-500">{totalYTD2025.toLocaleString()} Units</div>
               </div>
-              <div className={`p-2 rounded shadow-sm border-2 transition-all duration-500 hover:shadow-lg ${
-                totalForecast2026 > 0
-                  ? 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-300 shadow-purple-100'
-                  : 'bg-white border-gray-200'
-              }`}>
-                <div className="flex flex-col gap-1">
-                  <p className="text-xs text-gray-600 font-medium">Forecast {selectedYear2026}</p>
-                  <p className={`text-lg font-bold transition-all duration-500 ${
-                    totalForecast2026 > 0 ? 'text-purple-900 scale-105' : 'text-gray-500'
-                  }`}>${totalForecast2026.toLocaleString()}</p>
-                  <p className={`text-xs font-medium transition-colors duration-500 ${
-                    totalForecast2026 > 0 ? 'text-purple-600' : 'text-gray-400'
-                  }`}>
-                    {totalUnits2026.toLocaleString()} Units
-                  </p>
-                  {totalForecast2026 > 0 && (
-                    <div className="mt-1">
-                      <span className="inline-block px-1.5 py-0.5 bg-purple-200 text-purple-800 text-xs rounded-full font-medium animate-pulse">
-                        📈 Updated
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className={`p-2 rounded shadow-sm border-2 transition-all duration-500 hover:shadow-lg ${
-                forecastGrowth > 0
-                  ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-300'
-                  : forecastGrowth < 0
-                    ? 'bg-gradient-to-br from-red-50 to-red-100 border-red-300'
-                    : 'bg-white border-gray-200'
-              }`}>
-                <div className="flex flex-col gap-1">
-                  <p className="text-xs text-gray-600 font-medium">Forecast Growth (%)</p>
-                  <p className={`text-lg font-bold transition-all duration-500 flex items-center gap-1 ${
-                    forecastGrowth > 0
-                      ? 'text-green-900'
-                      : forecastGrowth < 0
-                        ? 'text-red-900'
-                        : 'text-gray-500'
-                  }`}>
-                    {forecastGrowth > 0 && '📈'}
-                    {forecastGrowth < 0 && '📉'}
-                    {forecastGrowth === 0 && '➡️'}
-                    {forecastGrowth.toFixed(1)}%
-                  </p>
-                  <p className="text-xs text-gray-600">From {selectedYear2025} to {selectedYear2026}</p>
-                </div>
+
+              {/* Forecast 2025 */}
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="text-sm text-gray-600 mb-1">Forecast 2025</div>
+                <div className="text-2xl font-bold text-purple-600">${totalMonthlyForecast.toLocaleString()}</div>
+                <div className="text-xs text-gray-500">{totalMonthlyForecast} Units</div>
               </div>
             </div>
 
