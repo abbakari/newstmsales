@@ -317,15 +317,51 @@ const RollingForecast: React.FC = () => {
     showNotification(`Download completed: ${fileName}`, 'success');
   };
 
-  // Calculate totals to match the uploaded image
-  const totalBudget2025 = 1381876; // From image: $1,381,876
-  const totalBudgetUnits = 8821; // From image: 8,821 Units
-  const totalSales2025 = 846313; // From image: $846,313
-  const totalSalesUnits = 4016; // From image: 4,016 Units
-  const totalForecast2025 = 0; // From image: $0
-  const totalForecastUnits = 0; // From image: 0 Units
-  const totalStock = tableData.reduce((sum, item) => sum + item.stock, 0); // 168,777 from header
-  const totalGIT = tableData.reduce((sum, item) => sum + item.git, 0); // 12,401 from header
+  // Calculate dynamic totals based on forecast data
+  const calculateDynamicTotals = () => {
+    let totalForecastValue = 0;
+    let totalForecastUnits = 0;
+    let totalBudgetValue = 0;
+    let totalBudgetUnits = 0;
+
+    // Calculate totals from all forecast data
+    Object.entries(forecastData).forEach(([rowId, data]) => {
+      if (data) {
+        // Sum forecast 2026 values (this will be our "Forecast 2025" display)
+        const forecastUnits = Object.values(data.budget2026).reduce((sum, val) => sum + (val || 0), 0);
+        totalForecastUnits += forecastUnits;
+
+        // Estimate value (assuming average unit price of $100)
+        const avgUnitPrice = 100;
+        totalForecastValue += forecastUnits * avgUnitPrice;
+
+        // Sum budget values
+        const budgetUnits = Object.values(data.budget2024).reduce((sum, val) => sum + (val || 0), 0);
+        totalBudgetUnits += budgetUnits;
+        totalBudgetValue += budgetUnits * avgUnitPrice;
+      }
+    });
+
+    return {
+      // Static base values from original data
+      baseBudget2025: 1381876,
+      baseBudgetUnits: 8821,
+      baseSales2025: 846313,
+      baseSalesUnits: 4016,
+
+      // Dynamic forecast values
+      totalForecastValue: Math.round(totalForecastValue),
+      totalForecastUnits,
+
+      // Combined budget (base + forecasted)
+      totalBudgetValue: Math.round(1381876 + totalBudgetValue),
+      totalBudgetUnits: 8821 + totalBudgetUnits
+    };
+  };
+
+  const dynamicTotals = calculateDynamicTotals();
+  const totalStock = tableData.reduce((sum, item) => sum + item.stock, 0);
+  const totalGIT = tableData.reduce((sum, item) => sum + item.git, 0);
 
   return (
     <Layout>
