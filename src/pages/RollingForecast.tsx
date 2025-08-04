@@ -216,14 +216,57 @@ const RollingForecast: React.FC = () => {
     showNotification(newState ? `Selected all ${tableData.length} items` : 'Deselected all items', 'success');
   };
 
-  const handleUpdateMonthlyUnits = (rowId: number, monthIndex: number, value: number) => {
-    setTableData(prev => prev.map(item =>
-      item.id === rowId ? {
-        ...item,
-        monthlyUnits: { ...item.monthlyUnits, [monthIndex]: value },
-        forecast2025: Object.values({ ...item.monthlyUnits, [monthIndex]: value }).reduce((sum, units) => sum + (units || 0), 0)
-      } : item
-    ));
+  // Handle expanding/collapsing forecast table
+  const handleToggleForecastTable = (rowId: number) => {
+    setExpandedForecastRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId);
+      } else {
+        newSet.add(rowId);
+        // Initialize forecast data for this row if not exists
+        if (!forecastData[rowId]) {
+          const initialData = {
+            budget2024: {},
+            budget2026: {},
+            act2026: {}
+          };
+          months.forEach(month => {
+            initialData.budget2024[month.short] = 0;
+            initialData.budget2026[month.short] = 0;
+            initialData.act2026[month.short] = 0;
+          });
+          setForecastData(prev => ({ ...prev, [rowId]: initialData }));
+        }
+      }
+      return newSet;
+    });
+  };
+
+  // Handle updating forecast values
+  const handleUpdateForecastValue = (rowId: number, year: string, month: string, value: number) => {
+    setForecastData(prev => ({
+      ...prev,
+      [rowId]: {
+        ...prev[rowId],
+        [year]: {
+          ...prev[rowId]?.[year],
+          [month]: value
+        }
+      }
+    }));
+  };
+
+  // Calculate forecast totals
+  const calculateForecastTotals = (rowId: number) => {
+    const data = forecastData[rowId];
+    if (!data) return { budget2024: 0, budget2026: 0, act2026: 0 };
+
+    return {
+      budget2024: Object.values(data.budget2024).reduce((sum, val) => sum + (val || 0), 0),
+      budget2026: Object.values(data.budget2026).reduce((sum, val) => sum + (val || 0), 0),
+      act2026: Object.values(data.act2026).reduce((sum, val) => sum + (val || 0), 0)
+    };
   };
 
   const showNotification = (message: string, type: 'success' | 'error') => {
