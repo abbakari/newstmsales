@@ -920,13 +920,20 @@ const RollingForecast: React.FC = () => {
                                     <div className="p-3 bg-gray-50 border-t border-gray-300 flex justify-between items-center">
                                       <div className="text-xs text-gray-600">
                                         <span className="font-medium">Note:</span> You can only edit future months (highlighted in green)
+                                        <div className="mt-1 text-blue-600">
+                                          <span className="font-medium">Impact:</span> Changes update Budget and Forecast totals above
+                                        </div>
                                       </div>
                                       <div className="flex gap-2">
                                         <button
                                           onClick={() => {
                                             // Calculate and update totals
                                             const totals = calculateForecastTotals(row.id);
-                                            showNotification(`Forecast saved! Total Budget 2026: ${totals.budget2026} units`, 'success');
+                                            const dynamicTotals = calculateDynamicTotals();
+                                            showNotification(
+                                              `Forecast saved! Total Budget 2026: ${totals.budget2026} units. Overall Forecast: ${dynamicTotals.totalForecastUnits} units`,
+                                              'success'
+                                            );
                                           }}
                                           className="bg-green-600 text-white px-4 py-2 rounded-md text-xs hover:bg-green-700 transition-colors"
                                         >
