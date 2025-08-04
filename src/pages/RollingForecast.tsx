@@ -354,38 +354,23 @@ const RollingForecast: React.FC = () => {
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Stock</p>
                   <p className="text-xl font-bold text-green-600">
-                    {tableData.reduce((sum, item) => sum + item.stock, 0).toLocaleString()} units
+                    {totalStock.toLocaleString()} units
                   </p>
                 </div>
               </div>
 
-              {/* GIT Card */}
+              {/* Total Sales Card */}
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3 relative">
                 <div className="bg-red-200 p-3 rounded-full">
-                  <Truck className="w-7 h-7 text-red-600" />
+                  <Target className="w-7 h-7 text-red-600" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm text-gray-600">GIT (Good In Transit)</p>
-                    <button
-                      onClick={() => setShowGitExplanation(!showGitExplanation)}
-                      className="text-red-600 hover:text-red-800 transition-colors"
-                    >
-                      <InfoIcon className="w-4 h-4" />
-                    </button>
+                    <p className="text-sm text-gray-600">Total Sales</p>
                   </div>
                   <p className="text-xl font-bold text-red-600">
-                    {tableData.reduce((sum, item) => sum + item.git, 0).toLocaleString()} units
+                    {totalGIT.toLocaleString()} units
                   </p>
-                  {showGitExplanation && (
-                    <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-white border border-red-200 rounded-lg shadow-lg z-10">
-                      <p className="text-xs text-gray-700">
-                        <strong>GIT (Good In Transit):</strong> Items that have been shipped from suppliers
-                        but haven't yet arrived at our warehouse. These are considered inventory assets
-                        but are not available for immediate sale.
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
 
