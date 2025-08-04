@@ -672,23 +672,6 @@ const RollingForecast: React.FC = () => {
                   </table>
                 </div>
               )}
-
-              {/* Action Button */}
-              {tableData.some(row => row.selected) && (
-                <div className="mt-4 flex justify-center">
-                  <button
-                    onClick={() => {
-                      const selectedRows = tableData.filter(row => row.selected);
-                      showNotification(`Opening forecast editor for ${selectedRows.length} selected item(s)`, 'success');
-                      // Here you can add logic to open monthly forecast editing for selected items
-                    }}
-                    className="bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition-all duration-200 transform hover:scale-110 shadow-lg"
-                    title="Edit forecast for selected items"
-                  >
-                    <Plus className="w-6 h-6" />
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>
