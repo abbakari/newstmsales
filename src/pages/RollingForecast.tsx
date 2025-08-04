@@ -533,7 +533,7 @@ const RollingForecast: React.FC = () => {
                   </button>
                 </div>
                 <div className="mt-2 text-xs text-blue-700">
-                  Click the green + button below to start editing forecast details for selected items
+                  Use the green + button in each row to edit forecast details for that specific item
                 </div>
               </div>
             )}
