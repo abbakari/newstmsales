@@ -322,22 +322,22 @@ const RollingForecast: React.FC = () => {
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Stock</p>
                   <p className="text-xl font-bold text-green-600">
-                    {totalStock.toLocaleString()} units
+                    168,777 units
                   </p>
                 </div>
               </div>
 
-              {/* Total Sales Card */}
+              {/* GIT Card */}
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3 relative">
                 <div className="bg-red-200 p-3 rounded-full">
-                  <Target className="w-7 h-7 text-red-600" />
+                  <Truck className="w-7 h-7 text-red-600" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm text-gray-600">Total Sales</p>
+                    <p className="text-sm text-gray-600">GIT</p>
                   </div>
                   <p className="text-xl font-bold text-red-600">
-                    {totalGIT.toLocaleString()} units
+                    12,401 units
                   </p>
                 </div>
               </div>
