@@ -101,7 +101,7 @@ const RollingForecast: React.FC = () => {
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
 
-  // Sample forecast data
+  // Sample forecast data matching the uploaded images
   const initialData: ForecastItem[] = [
     {
       id: 1,
@@ -111,23 +111,13 @@ const RollingForecast: React.FC = () => {
       category: "Tyres",
       brand: "BF Goodrich",
       itemCombined: "BF GOODRICH TYRE 235/85R16 (Tyres - BF Goodrich)",
-      forecast2025: 1200000,
-      actual2025: 850000,
-      forecast2026: 0,
-      rate: 341,
-      stock: 232,
-      git: 0,
-      forecastValue2026: 0,
-      discount: 0,
-      monthlyData: months.map(month => ({
-        month: month.short,
-        year: new Date().getFullYear(),
-        monthIndex: month.index,
-        quantity: 0,
-        unitPrice: 341,
-        totalValue: 0,
-        notes: ''
-      }))
+      budget2025: 1381876,
+      ytd2025: 8821,
+      forecast2025: 0,
+      stock: 0,
+      git: 80,
+      eta: "2024-12-15",
+      monthlyUnits: {}
     },
     {
       id: 2,
@@ -137,75 +127,77 @@ const RollingForecast: React.FC = () => {
       category: "Tyres",
       brand: "BF Goodrich",
       itemCombined: "BF GOODRICH TYRE 265/65R17 (Tyres - BF Goodrich)",
-      forecast2025: 980000,
-      actual2025: 720000,
-      forecast2026: 0,
-      rate: 412,
-      stock: 7,
-      git: 0,
-      forecastValue2026: 0,
-      discount: 0,
-      monthlyData: months.map(month => ({
-        month: month.short,
-        year: new Date().getFullYear(),
-        monthIndex: month.index,
-        quantity: 0,
-        unitPrice: 412,
-        totalValue: 0,
-        notes: ''
-      }))
+      budget2025: 846313,
+      ytd2025: 4016,
+      forecast2025: 0,
+      stock: 0,
+      git: 7,
+      eta: "2024-12-20",
+      monthlyUnits: {}
     },
     {
       id: 3,
       selected: false,
-      customer: "European Systems Ltd",
-      item: "MICHELIN TYRE 265/65R17 112T TL LTX TRAIL",
+      customer: "Zoya Enterprises",
+      item: "BF GOODRICH TYRE LT235/75R15 104/105S TL ALL-TERRAIN T/A KO2 LRC",
       category: "Tyres",
-      brand: "Michelin",
-      itemCombined: "MICHELIN TYRE 265/65R17 (Tyres - Michelin)",
-      forecast2025: 875000,
-      actual2025: 920000,
-      forecast2026: 0,
-      rate: 300,
-      stock: 127,
-      git: 0,
-      forecastValue2026: 0,
-      discount: 0,
-      monthlyData: months.map(month => ({
-        month: month.short,
-        year: new Date().getFullYear(),
-        monthIndex: month.index,
-        quantity: 0,
-        unitPrice: 300,
-        totalValue: 0,
-        notes: ''
-      }))
+      brand: "BF Goodrich",
+      itemCombined: "BF GOODRICH TYRE LT235/75R15 (Tyres - BF Goodrich)",
+      budget2025: 245000,
+      ytd2025: 1250,
+      forecast2025: 0,
+      stock: 0,
+      git: 9,
+      eta: "2024-12-18",
+      monthlyUnits: {}
     },
     {
       id: 4,
       selected: false,
-      customer: "Asia Pacific Trading",
-      item: "VALVE 0214 TR 414J FOR CAR TUBELESS TYRE",
-      category: "Accessories",
-      brand: "Generic",
-      itemCombined: "VALVE 0214 TR 414J (Accessories - Generic)",
-      forecast2025: 15000,
-      actual2025: 18000,
-      forecast2026: 0,
-      rate: 0.5,
-      stock: 2207,
-      git: 0,
-      forecastValue2026: 0,
-      discount: 0,
-      monthlyData: months.map(month => ({
-        month: month.short,
-        year: new Date().getFullYear(),
-        monthIndex: month.index,
-        quantity: 0,
-        unitPrice: 0.5,
-        totalValue: 0,
-        notes: ''
-      }))
+      customer: "Zoya Enterprises",
+      item: "BF GOODRICH TYRE 235/85R16 120/116S TL AT/TA KO2 LRERWLGO",
+      category: "Tyres",
+      brand: "BF Goodrich",
+      itemCombined: "BF GOODRICH TYRE 235/85R16 (Tyres - BF Goodrich)",
+      budget2025: 186000,
+      ytd2025: 980,
+      forecast2025: 0,
+      stock: 0,
+      git: 10,
+      eta: "2024-12-22",
+      monthlyUnits: {}
+    },
+    {
+      id: 5,
+      selected: false,
+      customer: "Zoya Enterprises",
+      item: "BF GOODRICH TYRE 265/65R18 119/116S TL AT/TA KO2 LRERWLGO",
+      category: "Tyres",
+      brand: "BF Goodrich",
+      itemCombined: "BF GOODRICH TYRE 265/65R18 (Tyres - BF Goodrich)",
+      budget2025: 156000,
+      ytd2025: 870,
+      forecast2025: 0,
+      stock: 0,
+      git: 44,
+      eta: "2024-12-25",
+      monthlyUnits: {}
+    },
+    {
+      id: 6,
+      selected: false,
+      customer: "Zoya Enterprises",
+      item: "MICHELIN TYRE 265/65R17 112T TL LTX TRAIL",
+      category: "Tyres",
+      brand: "Michelin",
+      itemCombined: "MICHELIN TYRE 265/65R17 (Tyres - Michelin)",
+      budget2025: 125000,
+      ytd2025: 650,
+      forecast2025: 0,
+      stock: 0,
+      git: 103,
+      eta: "2025-01-05",
+      monthlyUnits: {}
     }
   ];
 
