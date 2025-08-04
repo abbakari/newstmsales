@@ -67,15 +67,22 @@ const RollingForecast: React.FC = () => {
 
   // Modal states
   const [isForecastModalOpen, setIsForecastModalOpen] = useState(false);
-  
+
   // Notification state
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   // GIT explanation state
   const [showGitExplanation, setShowGitExplanation] = useState(false);
 
-  // Monthly editing state
-  const [editingMonthlyData, setEditingMonthlyData] = useState<{[key: number]: MonthlyForecast[]}>({});
+  // Monthly editing state for nested forecast tables
+  const [forecastData, setForecastData] = useState<{[key: number]: {
+    budget2024: { [month: string]: number };
+    budget2026: { [month: string]: number };
+    act2026: { [month: string]: number };
+  }}>({});
+
+  // Track which rows are expanded for forecast editing
+  const [expandedForecastRows, setExpandedForecastRows] = useState<Set<number>>(new Set());
 
   // Generate all months for the year with current month tracking
   const getAllYearMonths = () => {
