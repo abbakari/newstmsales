@@ -680,7 +680,7 @@ const RollingForecast: React.FC = () => {
               </div>
             </div>
 
-            {/* Data Table */}
+            {/* Data Table with Monthly Columns */}
             <div className="relative">
               {tableData.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 border border-gray-300 rounded-lg bg-white">
@@ -700,273 +700,187 @@ const RollingForecast: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <div className="max-h-[600px] border border-gray-300 rounded-lg overflow-y-auto">
-                  <table className="w-full bg-white border-collapse table-fixed">
-                    {/* Sticky Header */}
+                <div className="border border-gray-300 rounded-lg overflow-auto">
+                  <table className="w-full bg-white border-collapse text-xs">
+                    {/* Multi-level Header */}
                     <thead className="bg-gray-50 sticky top-0 z-10">
-                      <tr>
-                        <th className="w-12 p-2 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-200">
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4 accent-blue-600"
-                            checked={tableData.every(item => item.selected)}
-                            onChange={handleSelectAll}
-                          />
-                        </th>
-                        <th className="w-32 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-200">
+                      {/* Row 1: Main headers */}
+                      <tr className="border-b border-gray-300">
+                        <th rowSpan={2} className="w-32 p-2 text-left text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
                           Customer
                         </th>
-                        <th className="w-40 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-200">
-                          Item (Category - Brand)
+                        <th rowSpan={2} className="w-80 p-2 text-left text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                          Item
                         </th>
-                        <th className="w-20 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                          FORECAST {selectedYear2025}
+                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                          BUD<br/>25
                         </th>
-                        <th className="w-20 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                          ACTUAL {selectedYear2025}
+                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                          YTD<br/>25
                         </th>
-                        <th className="w-20 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-blue-50">
-                          FORECAST {selectedYear2026}
+                        <th className="w-20 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                          FORECAST
                         </th>
-                        <th className="w-16 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                          RATE
+                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                          STOCK
                         </th>
-                        <th className="w-14 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                          STK
-                        </th>
-                        <th className="w-14 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
                           GIT
                         </th>
-                        <th className="w-24 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                          FORECAST {selectedYear2026} Value
+                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                          ETA
                         </th>
-                        <th className="w-20 p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                          Actions
-                        </th>
+                        {months.map((month, index) => (
+                          <th key={index} className={`w-12 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300 ${
+                            month.isPast ? 'bg-gray-200' :
+                            month.isCurrent ? 'bg-orange-300' :
+                            'bg-green-50'
+                          }`}>
+                            {month.short}
+                          </th>
+                        ))}
+                      </tr>
+                      {/* Row 2: Sub headers and month year labels */}
+                      <tr className="border-b border-gray-300">
+                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300">25</td>
+                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300">25</td>
+                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300">26</td>
+                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300"></td>
+                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300"></td>
+                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300"></td>
+                        {months.map((month, index) => (
+                          <td key={index} className={`p-1 text-center text-xs text-gray-500 border-r border-gray-300 ${
+                            month.isPast ? 'bg-gray-200' :
+                            month.isCurrent ? 'bg-orange-300' :
+                            'bg-green-50'
+                          }`}>
+                            2024
+                          </td>
+                        ))}
                       </tr>
                     </thead>
 
                     <tbody>
-                      {tableData.map(row => (
-                        <React.Fragment key={row.id}>
-                          <tr className={`hover:bg-gray-50 ${row.selected ? 'bg-blue-50' : ''}`}>
-                            <td className="p-2 border-b border-r border-gray-200">
-                              <input
-                                type="checkbox"
-                                className="w-4 h-4 accent-blue-600"
-                                checked={row.selected}
-                                onChange={() => handleSelectRow(row.id)}
-                              />
-                            </td>
-                            <td className="p-2 border-b border-r border-gray-200 text-xs">
-                              <div className="truncate" title={row.customer}>
-                                {row.customer}
-                              </div>
-                            </td>
-                            <td className="p-2 border-b border-r border-gray-200 text-xs">
-                              <div className="truncate" title={row.item}>
-                                <div className="font-medium text-gray-900 truncate">
-                                  {row.item}
-                                </div>
-                                <div className="text-xs text-gray-500 truncate">
-                                  {row.category} - {row.brand}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="p-2 border-b border-gray-200 text-xs">
-                              ${(row.forecast2025/1000).toFixed(0)}k
-                            </td>
-                            <td className="p-2 border-b border-gray-200 text-xs">
-                              ${(row.actual2025/1000).toFixed(0)}k
-                            </td>
-                            <td className="p-2 border-b border-gray-200 bg-blue-50 text-xs">
-                              <input
-                                type="number"
-                                className="w-full p-1 text-center border border-gray-300 rounded text-xs"
-                                value={row.forecast2026}
-                                onChange={(e) => {
-                                  const value = parseInt(e.target.value) || 0;
-                                  setTableData(prev => prev.map(item =>
-                                    item.id === row.id ? { ...item, forecast2026: value } : item
-                                  ));
-                                }}
-                              />
-                            </td>
-                            <td className="p-2 border-b border-gray-200 text-xs">
-                              {row.rate}
-                            </td>
-                            <td className="p-2 border-b border-gray-200 text-xs">
-                              {row.stock}
-                            </td>
-                            <td className="p-2 border-b border-gray-200 text-xs">
-                              {row.git}
-                            </td>
-                            <td className="p-2 border-b border-gray-200 text-xs">
-                              ${(row.forecastValue2026/1000).toFixed(0)}k
-                            </td>
-                            <td className="p-2 border-b border-gray-200 text-xs">
-                              <div className="flex gap-1">
-                                {editingRowId === row.id ? (
-                                  <>
-                                    <button
-                                      onClick={() => handleSaveMonthlyData(row.id)}
-                                      className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors"
-                                      title="Save monthly data"
-                                    >
-                                      <Save className="w-3 h-3" />
-                                    </button>
-                                    <button
-                                      onClick={() => handleCancelMonthlyEdit(row.id)}
-                                      className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors"
-                                      title="Cancel edit"
-                                    >
-                                      <X className="w-3 h-3" />
-                                    </button>
-                                  </>
-                                ) : (
-                                  <button
-                                    onClick={() => handleEditMonthlyData(row.id)}
-                                    className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition-colors"
-                                    title="Edit monthly forecast"
-                                  >
-                                    <Calendar className="w-3 h-3" />
-                                  </button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
+                      {/* Budget Row (Orange highlighted) */}
+                      <tr className="bg-orange-400 text-white font-semibold">
+                        <td className="p-2 border-r border-gray-300">BUD 2026</td>
+                        <td className="p-2 border-r border-gray-300"></td>
+                        <td className="p-1 text-center border-r border-gray-300"></td>
+                        <td className="p-1 text-center border-r border-gray-300"></td>
+                        <td className="p-1 text-center border-r border-gray-300"></td>
+                        <td className="p-1 text-center border-r border-gray-300"></td>
+                        <td className="p-1 text-center border-r border-gray-300"></td>
+                        <td className="p-1 text-center border-r border-gray-300"></td>
+                        {months.map((month, index) => (
+                          <td key={index} className="p-1 text-center border-r border-gray-300">
+                            {/* Budget values could be added here */}
+                          </td>
+                        ))}
+                      </tr>
 
-                          {/* Monthly Data Entry Row */}
-                          {editingRowId === row.id && (
-                            <tr className="bg-gray-50">
-                              <td colSpan={11} className="p-4 border-b border-gray-200">
-                                <div className="bg-white rounded-lg p-4 border">
-                                  <div className="mb-4">
-                                    <h4 className="text-lg font-semibold flex items-center gap-2">
-                                      <Calendar className="w-5 h-5" />
-                                      Monthly Forecast Data for {selectedYear2026}
-                                    </h4>
-                                    <p className="text-sm text-gray-600 mt-1">Enter forecast quantities and pricing for each month</p>
-                                  </div>
+                      {/* ACT 2026 Row */}
+                      <tr className="bg-blue-100">
+                        <td className="p-2 border-r border-gray-300 font-medium">ACT 2026</td>
+                        <td className="p-2 border-r border-gray-300"></td>
+                        <td className="p-1 text-center border-r border-gray-300">0</td>
+                        <td className="p-1 text-center border-r border-gray-300">0</td>
+                        <td className="p-1 text-center border-r border-gray-300">0</td>
+                        <td className="p-1 text-center border-r border-gray-300">0</td>
+                        <td className="p-1 text-center border-r border-gray-300">0</td>
+                        <td className="p-1 text-center border-r border-gray-300">0</td>
+                        {months.map((month, index) => (
+                          <td key={index} className={`p-1 text-center border-r border-gray-300 ${
+                            month.isPast ? 'bg-gray-100' :
+                            month.isCurrent ? 'bg-orange-100' :
+                            'bg-white'
+                          }`}>
+                            0
+                          </td>
+                        ))}
+                      </tr>
 
-                                  {/* 2-Row Horizontal Table */}
-                                  <div className="overflow-x-auto">
-                                    <table className="w-full min-w-[800px] border border-gray-300 rounded-lg">
-                                      <thead>
-                                        <tr className="bg-gray-100">
-                                          <th className="p-3 text-left text-sm font-semibold text-gray-700 border-r border-gray-300 min-w-[80px]">Month</th>
-                                          {editingMonthlyData[row.id]?.map((month, monthIndex) => (
-                                            <th key={monthIndex} className="p-3 text-center text-sm font-semibold text-gray-700 border-r border-gray-300 min-w-[80px]">
-                                              {month.month}
-                                            </th>
-                                          )) || []}
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr className="bg-white">
-                                          <td className="p-3 font-medium text-gray-800 border-r border-gray-300 bg-gray-50">Quantity</td>
-                                          {editingMonthlyData[row.id]?.map((month, monthIndex) => (
-                                            <td key={monthIndex} className="p-2 border-r border-gray-300">
-                                              <input
-                                                type="number"
-                                                className="w-full p-2 text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                value={month.quantity}
-                                                onChange={(e) => handleMonthlyDataChange(
-                                                  row.id,
-                                                  monthIndex,
-                                                  'quantity',
-                                                  parseInt(e.target.value) || 0
-                                                )}
-                                                placeholder="0"
-                                              />
-                                            </td>
-                                          )) || []}
-                                        </tr>
-                                        <tr className="bg-gray-50">
-                                          <td className="p-3 font-medium text-gray-800 border-r border-gray-300 bg-gray-50">Unit Price</td>
-                                          {editingMonthlyData[row.id]?.map((month, monthIndex) => (
-                                            <td key={monthIndex} className="p-2 border-r border-gray-300">
-                                              <input
-                                                type="number"
-                                                step="0.01"
-                                                className="w-full p-2 text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                value={month.unitPrice}
-                                                onChange={(e) => handleMonthlyDataChange(
-                                                  row.id,
-                                                  monthIndex,
-                                                  'unitPrice',
-                                                  parseFloat(e.target.value) || 0
-                                                )}
-                                                placeholder="0.00"
-                                              />
-                                            </td>
-                                          )) || []}
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </div>
-
-                                  {/* Summary Stats */}
-                                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-200 mt-4">
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                                      <div>
-                                        <div className="text-sm text-blue-600 font-medium">Total Quantity</div>
-                                        <div className="text-lg font-bold text-blue-800">
-                                          {editingMonthlyData[row.id]?.reduce((sum, month) => sum + month.quantity, 0).toLocaleString() || 0}
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <div className="text-sm text-green-600 font-medium">Total Value</div>
-                                        <div className="text-lg font-bold text-green-800">
-                                          ${editingMonthlyData[row.id]?.reduce((sum, month) => sum + (month.quantity * month.unitPrice), 0).toLocaleString() || 0}
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <div className="text-sm text-purple-600 font-medium">Avg/Month</div>
-                                        <div className="text-lg font-bold text-purple-800">
-                                          {Math.round((editingMonthlyData[row.id]?.reduce((sum, month) => sum + month.quantity, 0) || 0) / 12).toLocaleString()}
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <div className="text-sm text-orange-600 font-medium">Avg Price</div>
-                                        <div className="text-lg font-bold text-orange-800">
-                                          ${((editingMonthlyData[row.id]?.reduce((sum, month) => sum + month.unitPrice, 0) || 0) / 12).toFixed(2)}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="mt-4 flex justify-between items-center">
-                                    <div className="text-sm text-gray-600">
-                                      <strong>Total Forecast Value:</strong> ${editingMonthlyData[row.id]?.reduce((sum, month) => sum + (month.quantity * month.unitPrice), 0).toLocaleString() || 0}
-                                    </div>
-                                    <div className="flex gap-2">
-                                      <button
-                                        onClick={() => handleSaveMonthlyData(row.id)}
-                                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors flex items-center gap-2"
-                                      >
-                                        <Save className="w-4 h-4" />
-                                        Save & Apply
-                                      </button>
-                                      <button
-                                        onClick={() => handleCancelMonthlyEdit(row.id)}
-                                        className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center gap-2"
-                                      >
-                                        <X className="w-4 h-4" />
-                                        Cancel
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
+                      {/* Data Rows */}
+                      {tableData.map((row, rowIndex) => (
+                        <tr key={row.id} className={`hover:bg-gray-50 ${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
+                          <td className="p-2 border-r border-gray-300 text-xs">
+                            <div className="truncate" title={row.customer}>
+                              {row.customer}
+                            </div>
+                          </td>
+                          <td className="p-2 border-r border-gray-300 text-xs">
+                            <div className="truncate max-w-xs" title={row.item}>
+                              {row.item}
+                            </div>
+                          </td>
+                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                            {Math.round(row.budget2025 / 1000)}
+                          </td>
+                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                            {row.ytd2025}
+                          </td>
+                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                            {row.forecast2025}
+                          </td>
+                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                            {row.stock}
+                          </td>
+                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                            {row.git}
+                          </td>
+                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                            <div className="flex items-center justify-center">
+                              <div className={`w-2 h-2 rounded-full mr-1 ${
+                                new Date(row.eta) > new Date() ? 'bg-green-500' : 'bg-red-500'
+                              }`}></div>
+                              {new Date(row.eta).getDate()}
+                            </div>
+                          </td>
+                          {months.map((month, monthIndex) => (
+                            <td key={monthIndex} className={`p-1 text-center border-r border-gray-300 ${
+                              month.isPast ? 'bg-gray-100 text-gray-400' :
+                              month.isCurrent ? 'bg-orange-100' :
+                              'bg-white'
+                            }`}>
+                              {month.isFuture ? (
+                                <input
+                                  type="number"
+                                  className="w-full text-center border-0 bg-transparent focus:bg-blue-50 focus:ring-1 focus:ring-blue-500 rounded text-xs p-1"
+                                  placeholder="0"
+                                  value={row.monthlyUnits[monthIndex] || ''}
+                                  onChange={(e) => {
+                                    const value = parseInt(e.target.value) || 0;
+                                    setTableData(prev => prev.map(item =>
+                                      item.id === row.id ? {
+                                        ...item,
+                                        monthlyUnits: { ...item.monthlyUnits, [monthIndex]: value }
+                                      } : item
+                                    ));
+                                  }}
+                                  min="0"
+                                />
+                              ) : (
+                                <span className="text-gray-400">0</span>
+                              )}
+                            </td>
+                          ))}
+                        </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               )}
+            </div>
+
+            {/* Submit Button */}
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => {
+                  showNotification('Forecast data submitted successfully!', 'success');
+                }}
+                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold"
+              >
+                Submit
+              </button>
             </div>
           </div>
         </div>
