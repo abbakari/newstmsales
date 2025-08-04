@@ -558,9 +558,9 @@ const RollingForecast: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <div className="border border-gray-300 rounded-lg overflow-auto">
+                <div className="border border-gray-300 rounded-lg overflow-auto max-h-96">
                   <table className="w-full bg-white border-collapse text-xs">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-50 sticky top-0 z-10">
                       <tr className="border-b border-gray-200">
                         <th className="w-10 p-3 text-center border-r border-gray-200">
                           <input
@@ -592,8 +592,11 @@ const RollingForecast: React.FC = () => {
                         <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           GIT
                         </th>
-                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           ETA
+                        </th>
+                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
                         </th>
                       </tr>
                     </thead>
@@ -634,7 +637,7 @@ const RollingForecast: React.FC = () => {
                           <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
                             {row.git}
                           </td>
-                          <td className="p-3 text-center text-xs">
+                          <td className="p-3 text-center border-r border-gray-200 text-xs">
                             <div className="flex items-center justify-center">
                               <div className={`w-2 h-2 rounded-full ${
                                 row.stock > 0 ? 'bg-green-500' :
@@ -647,6 +650,21 @@ const RollingForecast: React.FC = () => {
                                 </span>
                               )}
                             </div>
+                          </td>
+                          <td className="p-3 text-center">
+                            <button
+                              onClick={() => {
+                                // Select this row and open forecast editor
+                                setTableData(prev => prev.map(item =>
+                                  item.id === row.id ? { ...item, selected: true } : item
+                                ));
+                                showNotification(`Opening forecast editor for ${row.customer}`, 'success');
+                              }}
+                              className="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-all duration-200 transform hover:scale-110"
+                              title={`Edit forecast for ${row.customer}`}
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
                           </td>
                         </tr>
                       ))}
