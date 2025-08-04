@@ -241,64 +241,14 @@ const RollingForecast: React.FC = () => {
     showNotification(newState ? `Selected all ${tableData.length} items` : 'Deselected all items', 'success');
   };
 
-  const handleEditMonthlyData = (rowId: number) => {
-    const row = tableData.find(item => item.id === rowId);
-    if (row) {
-      setEditingRowId(rowId);
-      setEditingMonthlyData({
-        [rowId]: [...row.monthlyData]
-      });
-    }
-  };
-
-  const handleMonthlyDataChange = (rowId: number, monthIndex: number, field: keyof MonthlyForecast, value: number | string) => {
-    setEditingMonthlyData(prev => ({
-      ...prev,
-      [rowId]: prev[rowId]?.map((month, index) => 
-        index === monthIndex ? { ...month, [field]: value } : month
-      ) || []
-    }));
-  };
-
-  const handleSaveMonthlyData = (rowId: number) => {
-    const monthlyData = editingMonthlyData[rowId];
-    if (monthlyData) {
-      const forecastValue2026 = monthlyData.reduce((sum, month) => sum + month.totalValue, 0);
-      const totalQuantity = monthlyData.reduce((sum, month) => sum + month.quantity, 0);
-
-      // Update monthly data with calculated total values
-      const updatedMonthlyData = monthlyData.map(month => ({
-        ...month,
-        totalValue: month.quantity * month.unitPrice
-      }));
-
-      setTableData(prev => prev.map(item =>
-        item.id === rowId ? {
-          ...item,
-          monthlyData: updatedMonthlyData,
-          forecast2026: totalQuantity,
-          forecastValue2026: forecastValue2026
-        } : item
-      ));
-
-      setEditingRowId(null);
-      setEditingMonthlyData(prev => {
-        const newData = { ...prev };
-        delete newData[rowId];
-        return newData;
-      });
-
-      showNotification(`Monthly forecast data saved for row ${rowId}`, 'success');
-    }
-  };
-
-  const handleCancelMonthlyEdit = (rowId: number) => {
-    setEditingRowId(null);
-    setEditingMonthlyData(prev => {
-      const newData = { ...prev };
-      delete newData[rowId];
-      return newData;
-    });
+  const handleUpdateMonthlyUnits = (rowId: number, monthIndex: number, value: number) => {
+    setTableData(prev => prev.map(item =>
+      item.id === rowId ? {
+        ...item,
+        monthlyUnits: { ...item.monthlyUnits, [monthIndex]: value },
+        forecast2025: Object.values({ ...item.monthlyUnits, [monthIndex]: value }).reduce((sum, units) => sum + (units || 0), 0)
+      } : item
+    ));
   };
 
   const showNotification = (message: string, type: 'success' | 'error') => {
