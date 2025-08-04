@@ -374,7 +374,7 @@ const RollingForecast: React.FC = () => {
                 selectedCustomer ? 'border-blue-400 bg-blue-50' : 'border-yellow-400'
               }`}>
                 <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
-                  ��� CUSTOMER:
+                  👤 CUSTOMER:
                   {selectedCustomer && <span className="text-blue-600">✓</span>}
                 </label>
                 <select
@@ -538,6 +538,32 @@ const RollingForecast: React.FC = () => {
                 <div className="text-xs text-gray-500">0 Units</div>
               </div>
             </div>
+
+            {/* Selection Summary */}
+            {tableData.some(row => row.selected) && (
+              <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                    <span className="text-sm font-medium text-blue-800">
+                      {tableData.filter(row => row.selected).length} item(s) selected for forecasting
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setTableData(prev => prev.map(item => ({ ...item, selected: false })));
+                      showNotification('All selections cleared', 'success');
+                    }}
+                    className="text-blue-600 hover:text-blue-800 text-xs underline"
+                  >
+                    Clear Selection
+                  </button>
+                </div>
+                <div className="mt-2 text-xs text-blue-700">
+                  Click the green + button below to start editing forecast details for selected items
+                </div>
+              </div>
+            )}
 
             {/* Simple Data Table */}
             <div className="relative">
