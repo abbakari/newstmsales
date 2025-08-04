@@ -79,23 +79,29 @@ const RollingForecast: React.FC = () => {
   // Monthly editing state
   const [editingMonthlyData, setEditingMonthlyData] = useState<{[key: number]: MonthlyForecast[]}>({});
 
-  // Generate all months for the year
+  // Generate all months for the year with current month tracking
   const getAllYearMonths = () => {
     const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
     const months = [];
 
     for (let i = 0; i < 12; i++) {
       const date = new Date(currentDate.getFullYear(), i, 1);
       months.push({
-        short: date.toLocaleDateString('en-US', { month: 'short' }),
+        short: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
         full: date.toLocaleDateString('en-US', { month: 'long' }),
-        index: i
+        index: i,
+        isPast: i < currentMonth,
+        isCurrent: i === currentMonth,
+        isFuture: i > currentMonth
       });
     }
     return months;
   };
 
   const months = getAllYearMonths();
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
 
   // Sample forecast data
   const initialData: ForecastItem[] = [
