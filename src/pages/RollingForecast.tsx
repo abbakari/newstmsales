@@ -300,12 +300,14 @@ const RollingForecast: React.FC = () => {
   };
 
   // Calculate totals
+  const totalBudget2025 = tableData.reduce((sum, item) => sum + item.budget2025, 0);
+  const totalYTD2025 = tableData.reduce((sum, item) => sum + item.ytd2025, 0);
   const totalForecast2025 = tableData.reduce((sum, item) => sum + item.forecast2025, 0);
-  const totalActual2025 = tableData.reduce((sum, item) => sum + item.actual2025, 0);
-  const totalForecast2026 = tableData.reduce((sum, item) => sum + item.forecastValue2026, 0);
-  const totalUnits2025 = tableData.reduce((sum, item) => sum + Math.floor(item.forecast2025 / (item.rate || 1)), 0);
-  const totalUnits2026 = tableData.reduce((sum, item) => sum + item.forecast2026, 0);
-  const forecastGrowth = totalForecast2025 > 0 ? ((totalForecast2026 - totalForecast2025) / totalForecast2025) * 100 : 0;
+  const totalStock = tableData.reduce((sum, item) => sum + item.stock, 0);
+  const totalGIT = tableData.reduce((sum, item) => sum + item.git, 0);
+  const totalMonthlyForecast = tableData.reduce((sum, item) =>
+    sum + Object.values(item.monthlyUnits).reduce((monthSum, units) => monthSum + (units || 0), 0), 0
+  );
 
   return (
     <Layout>
