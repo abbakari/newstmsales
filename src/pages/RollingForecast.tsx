@@ -245,16 +245,25 @@ const RollingForecast: React.FC = () => {
 
   // Handle updating forecast values
   const handleUpdateForecastValue = (rowId: number, year: string, month: string, value: number) => {
-    setForecastData(prev => ({
-      ...prev,
-      [rowId]: {
-        ...prev[rowId],
-        [year]: {
-          ...prev[rowId]?.[year],
-          [month]: value
+    setForecastData(prev => {
+      const newData = {
+        ...prev,
+        [rowId]: {
+          ...prev[rowId],
+          [year]: {
+            ...prev[rowId]?.[year],
+            [month]: value
+          }
         }
+      };
+
+      // Show real-time feedback
+      if (value > 0) {
+        showNotification(`Updated ${month} forecast: ${value} units`, 'success');
       }
-    }));
+
+      return newData;
+    });
   };
 
   // Calculate forecast totals
