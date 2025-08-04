@@ -559,10 +559,10 @@ const RollingForecast: React.FC = () => {
                 </div>
               ) : (
                 <div className="border border-gray-300 rounded-lg overflow-auto max-h-96">
-                  <table className="w-full bg-white border-collapse text-xs">
+                  <table className="min-w-[1200px] w-full bg-white border-collapse text-xs">
                     <thead className="bg-gray-50 sticky top-0 z-10">
                       <tr className="border-b border-gray-200">
-                        <th className="w-10 p-3 text-center border-r border-gray-200">
+                        <th className="w-12 p-3 text-center border-r border-gray-200">
                           <input
                             type="checkbox"
                             className="w-4 h-4 accent-blue-600 rounded"
@@ -571,31 +571,31 @@ const RollingForecast: React.FC = () => {
                             title="Select all"
                           />
                         </th>
-                        <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                        <th className="w-48 p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           Customer
                         </th>
-                        <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                        <th className="w-96 p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           Item
                         </th>
-                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                        <th className="w-20 p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           BUD<br/>25
                         </th>
-                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                        <th className="w-20 p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           YTD<br/>25
                         </th>
-                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                        <th className="w-24 p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           FORECAST
                         </th>
-                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                        <th className="w-20 p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           STOCK
                         </th>
-                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                        <th className="w-16 p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           GIT
                         </th>
-                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                        <th className="w-20 p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           ETA
                         </th>
-                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="w-20 p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Actions
                         </th>
                       </tr>
