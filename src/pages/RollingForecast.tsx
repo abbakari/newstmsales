@@ -520,22 +520,22 @@ const RollingForecast: React.FC = () => {
               {/* Budget 2025 */}
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <div className="text-sm text-gray-600 mb-1">Budget 2025</div>
-                <div className="text-2xl font-bold text-blue-600">${(totalBudget2025/1000000).toFixed(2)}M</div>
-                <div className="text-xs text-gray-500">{(totalBudget2025/1000).toLocaleString()} Units</div>
+                <div className="text-2xl font-bold text-blue-600">$1,381,876</div>
+                <div className="text-xs text-gray-500">8,821 Units</div>
               </div>
 
               {/* Sales 2025 */}
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <div className="text-sm text-gray-600 mb-1">Sales 2025</div>
-                <div className="text-2xl font-bold text-green-600">${(totalYTD2025/1000).toFixed(0)}K</div>
-                <div className="text-xs text-gray-500">{totalYTD2025.toLocaleString()} Units</div>
+                <div className="text-2xl font-bold text-orange-600">$846,313</div>
+                <div className="text-xs text-gray-500">4,016 Units</div>
               </div>
 
               {/* Forecast 2025 */}
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <div className="text-sm text-gray-600 mb-1">Forecast 2025</div>
-                <div className="text-2xl font-bold text-purple-600">${totalMonthlyForecast.toLocaleString()}</div>
-                <div className="text-xs text-gray-500">{totalMonthlyForecast} Units</div>
+                <div className="text-2xl font-bold text-blue-600">$0</div>
+                <div className="text-xs text-gray-500">0 Units</div>
               </div>
             </div>
 
