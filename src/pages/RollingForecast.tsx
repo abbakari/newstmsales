@@ -652,71 +652,219 @@ const RollingForecast: React.FC = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {tableData.map((row, rowIndex) => (
-                        <tr key={row.id} className={`hover:bg-gray-50 ${row.selected ? 'bg-blue-50' : ''}`}>
-                          <td className="p-3 border-r border-gray-200 text-center">
-                            <input
-                              type="checkbox"
-                              className="w-4 h-4 accent-blue-600 rounded"
-                              checked={row.selected}
-                              onChange={() => handleSelectRow(row.id)}
-                              title="Select this row"
-                            />
-                          </td>
-                          <td className="p-3 border-r border-gray-200 text-xs">
-                            <div className="text-gray-900 font-medium whitespace-nowrap">
-                              {row.customer}
-                            </div>
-                          </td>
-                          <td className="p-3 border-r border-gray-200 text-xs">
-                            <div className="text-gray-900 whitespace-nowrap" title={row.item}>
-                              {row.item}
-                            </div>
-                          </td>
-                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
-                            0
-                          </td>
-                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
-                            {row.ytd2025}
-                          </td>
-                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
-                            0
-                          </td>
-                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
-                            {row.stock}
-                          </td>
-                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
-                            {row.git}
-                          </td>
-                          <td className="p-3 text-center border-r border-gray-200 text-xs">
-                            <div className="flex items-center justify-center">
-                              <div className={`w-2 h-2 rounded-full ${
-                                row.stock > 0 ? 'bg-green-500' :
-                                row.git > 0 ? 'bg-red-500' :
-                                'bg-green-500'
-                              }`}></div>
-                              {row.eta && (
-                                <span className="ml-1 text-gray-600 text-xs">
-                                  {row.eta.split('-')[2]}-{row.eta.split('-')[1].substring(0, 2)}
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="p-3 text-center">
-                            <button
-                              onClick={() => {
-                                // Select this row and open forecast editor
-                                setTableData(prev => prev.map(item =>
-                                  item.id === row.id ? { ...item, selected: true } : item
-                                ));
-                                showNotification(`Opening forecast editor for ${row.customer}`, 'success');
-                              }}
-                              className="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-all duration-200 transform hover:scale-110"
-                              title={`Edit forecast for ${row.customer}`}
-                            >
-                              <Plus className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
+                        <React.Fragment key={row.id}>
+                          {/* Main Row */}
+                          <tr className={`hover:bg-gray-50 ${row.selected ? 'bg-blue-50' : ''}`}>
+                            <td className="p-3 border-r border-gray-200 text-center">
+                              <input
+                                type="checkbox"
+                                className="w-4 h-4 accent-blue-600 rounded"
+                                checked={row.selected}
+                                onChange={() => handleSelectRow(row.id)}
+                                title="Select this row"
+                              />
+                            </td>
+                            <td className="p-3 border-r border-gray-200 text-xs">
+                              <div className="text-gray-900 font-medium whitespace-nowrap">
+                                {row.customer}
+                              </div>
+                            </td>
+                            <td className="p-3 border-r border-gray-200 text-xs">
+                              <div className="text-gray-900 whitespace-nowrap" title={row.item}>
+                                {row.item}
+                              </div>
+                            </td>
+                            <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
+                              {(() => {
+                                const totals = calculateForecastTotals(row.id);
+                                return totals.budget2024 || 0;
+                              })()}
+                            </td>
+                            <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
+                              {row.ytd2025}
+                            </td>
+                            <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
+                              {(() => {
+                                const totals = calculateForecastTotals(row.id);
+                                return totals.budget2026 || 0;
+                              })()}
+                            </td>
+                            <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
+                              {row.stock}
+                            </td>
+                            <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
+                              {row.git}
+                            </td>
+                            <td className="p-3 text-center border-r border-gray-200 text-xs">
+                              <div className="flex items-center justify-center">
+                                <div className={`w-2 h-2 rounded-full ${
+                                  row.stock > 0 ? 'bg-green-500' :
+                                  row.git > 0 ? 'bg-red-500' :
+                                  'bg-green-500'
+                                }`}></div>
+                                {row.eta && (
+                                  <span className="ml-1 text-gray-600 text-xs">
+                                    {row.eta.split('-')[2]}-{row.eta.split('-')[1].substring(0, 2)}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="p-3 text-center">
+                              <button
+                                onClick={() => {
+                                  handleToggleForecastTable(row.id);
+                                  showNotification(
+                                    expandedForecastRows.has(row.id)
+                                      ? `Closing forecast editor for ${row.customer}`
+                                      : `Opening forecast editor for ${row.customer}`,
+                                    'success'
+                                  );
+                                }}
+                                className={`${expandedForecastRows.has(row.id) ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} text-white p-2 rounded-full transition-all duration-200 transform hover:scale-110`}
+                                title={`${expandedForecastRows.has(row.id) ? 'Close' : 'Edit'} forecast for ${row.customer}`}
+                              >
+                                {expandedForecastRows.has(row.id) ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                              </button>
+                            </td>
+                          </tr>
+
+                          {/* Nested Forecast Table */}
+                          {expandedForecastRows.has(row.id) && (
+                            <tr>
+                              <td colSpan={10} className="p-0 bg-gray-50">
+                                <div className="p-4 border-t border-gray-200">
+                                  <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
+                                    <div className="p-3 bg-gray-100 border-b border-gray-300">
+                                      <h4 className="text-sm font-semibold text-gray-800">
+                                        Monthly Forecast for {row.customer} - {row.item}
+                                      </h4>
+                                    </div>
+
+                                    {/* Monthly Forecast Table */}
+                                    <div className="overflow-x-auto">
+                                      <table className="w-full text-xs border-collapse">
+                                        <thead>
+                                          <tr className="bg-gray-50">
+                                            <th className="p-2 text-left text-xs font-medium text-gray-500 uppercase border-r border-gray-300 min-w-[80px]">
+                                              MONTH
+                                            </th>
+                                            {months.map((month, monthIndex) => (
+                                              <th key={monthIndex} className={`p-2 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300 min-w-[60px] ${
+                                                month.isPast ? 'bg-gray-200' :
+                                                month.isCurrent ? 'bg-orange-200' :
+                                                'bg-green-50'
+                                              }`}>
+                                                {month.short}
+                                              </th>
+                                            ))}
+                                            <th className="p-2 text-center text-xs font-medium text-gray-500 uppercase min-w-[80px]">
+                                              TOTAL
+                                            </th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {/* 2024 Row */}
+                                          <tr className="border-b border-gray-200">
+                                            <td className="p-2 font-medium text-gray-800 border-r border-gray-300 bg-gray-50">
+                                              2024
+                                            </td>
+                                            {months.map((month, monthIndex) => (
+                                              <td key={monthIndex} className={`p-1 text-center border-r border-gray-300 ${
+                                                month.isPast ? 'bg-gray-100 text-gray-400' :
+                                                month.isCurrent ? 'bg-orange-100' :
+                                                'bg-white'
+                                              }`}>
+                                                <span className="text-gray-400 text-xs">0</span>
+                                              </td>
+                                            ))}
+                                            <td className="p-2 text-center font-semibold text-gray-800">
+                                              {calculateForecastTotals(row.id).budget2024}
+                                            </td>
+                                          </tr>
+
+                                          {/* BUD 2026 Row */}
+                                          <tr className="bg-orange-400 text-white font-semibold border-b border-gray-200">
+                                            <td className="p-2 border-r border-gray-300">
+                                              BUD 2026
+                                            </td>
+                                            {months.map((month, monthIndex) => (
+                                              <td key={monthIndex} className="p-1 text-center border-r border-gray-300">
+                                                {month.isFuture ? (
+                                                  <input
+                                                    type="number"
+                                                    className="w-full text-center bg-white text-gray-900 border-0 rounded p-1 text-xs"
+                                                    placeholder="0"
+                                                    value={forecastData[row.id]?.budget2026[month.short] || ''}
+                                                    onChange={(e) => handleUpdateForecastValue(
+                                                      row.id,
+                                                      'budget2026',
+                                                      month.short,
+                                                      parseInt(e.target.value) || 0
+                                                    )}
+                                                    min="0"
+                                                  />
+                                                ) : (
+                                                  <span className="text-xs">0</span>
+                                                )}
+                                              </td>
+                                            ))}
+                                            <td className="p-2 text-center font-bold">
+                                              {calculateForecastTotals(row.id).budget2026}
+                                            </td>
+                                          </tr>
+
+                                          {/* ACT 2026 Row */}
+                                          <tr className="bg-blue-100 border-b border-gray-200">
+                                            <td className="p-2 font-medium text-gray-800 border-r border-gray-300">
+                                              ACT 2026
+                                            </td>
+                                            {months.map((month, monthIndex) => (
+                                              <td key={monthIndex} className={`p-1 text-center border-r border-gray-300 ${
+                                                month.isPast ? 'bg-gray-100' :
+                                                month.isCurrent ? 'bg-orange-100' :
+                                                'bg-white'
+                                              }`}>
+                                                <span className="text-gray-600 text-xs">0</span>
+                                              </td>
+                                            ))}
+                                            <td className="p-2 text-center font-semibold text-gray-800">
+                                              {calculateForecastTotals(row.id).act2026}
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="p-3 bg-gray-50 border-t border-gray-300 flex justify-between items-center">
+                                      <div className="text-xs text-gray-600">
+                                        <span className="font-medium">Note:</span> You can only edit future months (highlighted in green)
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => {
+                                            // Calculate and update totals
+                                            const totals = calculateForecastTotals(row.id);
+                                            showNotification(`Forecast saved! Total Budget 2026: ${totals.budget2026} units`, 'success');
+                                          }}
+                                          className="bg-green-600 text-white px-4 py-2 rounded-md text-xs hover:bg-green-700 transition-colors"
+                                        >
+                                          Save Forecast
+                                        </button>
+                                        <button
+                                          onClick={() => handleToggleForecastTable(row.id)}
+                                          className="bg-gray-600 text-white px-4 py-2 rounded-md text-xs hover:bg-gray-700 transition-colors"
+                                        >
+                                          Close
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>
