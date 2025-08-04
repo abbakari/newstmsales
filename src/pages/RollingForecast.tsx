@@ -577,10 +577,27 @@ const RollingForecast: React.FC = () => {
             {/* Summary Cards Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               {/* Budget 2025 */}
-              <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+              <div className={`p-4 rounded-lg shadow-sm border transition-all duration-300 ${
+                dynamicTotals.totalBudgetValue > dynamicTotals.baseBudget2025
+                  ? 'bg-blue-50 border-blue-300 shadow-blue-100'
+                  : 'bg-white border-gray-200'
+              }`}>
                 <div className="text-sm text-gray-600 mb-1">Budget 2025</div>
-                <div className="text-2xl font-bold text-blue-600">$1,381,876</div>
-                <div className="text-xs text-gray-500">8,821 Units</div>
+                <div className={`text-2xl font-bold transition-all duration-300 ${
+                  dynamicTotals.totalBudgetValue > dynamicTotals.baseBudget2025
+                    ? 'text-blue-700 scale-105'
+                    : 'text-blue-600'
+                }`}>
+                  ${dynamicTotals.totalBudgetValue.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {dynamicTotals.totalBudgetUnits.toLocaleString()} Units
+                  {dynamicTotals.totalBudgetUnits > dynamicTotals.baseBudgetUnits && (
+                    <span className="ml-2 text-green-600 font-medium">
+                      (+{(dynamicTotals.totalBudgetUnits - dynamicTotals.baseBudgetUnits).toLocaleString()})
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Sales 2025 */}
@@ -591,10 +608,29 @@ const RollingForecast: React.FC = () => {
               </div>
 
               {/* Forecast 2025 */}
-              <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+              <div className={`p-4 rounded-lg shadow-sm border transition-all duration-300 ${
+                dynamicTotals.totalForecastValue > 0
+                  ? 'bg-green-50 border-green-300 shadow-green-100'
+                  : 'bg-white border-gray-200'
+              }`}>
                 <div className="text-sm text-gray-600 mb-1">Forecast 2025</div>
-                <div className="text-2xl font-bold text-blue-600">$0</div>
-                <div className="text-xs text-gray-500">0 Units</div>
+                <div className={`text-2xl font-bold transition-all duration-500 ${
+                  dynamicTotals.totalForecastValue > 0
+                    ? 'text-green-700 scale-105'
+                    : 'text-blue-600'
+                }`}>
+                  ${dynamicTotals.totalForecastValue.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {dynamicTotals.totalForecastUnits.toLocaleString()} Units
+                  {dynamicTotals.totalForecastValue > 0 && (
+                    <div className="mt-1">
+                      <span className="inline-block px-2 py-1 bg-green-200 text-green-800 text-xs rounded-full font-medium animate-pulse">
+                        📈 Updated
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
