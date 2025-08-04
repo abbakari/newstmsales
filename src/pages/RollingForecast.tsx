@@ -474,7 +474,7 @@ const RollingForecast: React.FC = () => {
                 selectedItem ? 'border-orange-400 bg-orange-50' : 'border-yellow-400'
               }`}>
                 <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
-                  �� ITEM:
+                  🔧 ITEM:
                   {selectedItem && <span className="text-orange-600">✓</span>}
                 </label>
                 <select
@@ -571,7 +571,7 @@ const RollingForecast: React.FC = () => {
               </div>
             </div>
 
-            {/* Data Table with Monthly Columns */}
+            {/* Simple Data Table */}
             <div className="relative">
               {tableData.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 border border-gray-300 rounded-lg bg-white">
@@ -593,185 +593,82 @@ const RollingForecast: React.FC = () => {
               ) : (
                 <div className="border border-gray-300 rounded-lg overflow-auto">
                   <table className="w-full bg-white border-collapse text-xs">
-                    {/* Multi-level Header */}
-                    <thead className="bg-gray-50 sticky top-0 z-10">
-                      {/* Row 1: Main headers */}
-                      <tr className="border-b border-gray-300">
-                        <th rowSpan={2} className="w-32 p-2 text-left text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                    <thead className="bg-gray-50">
+                      <tr className="border-b border-gray-200">
+                        <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           Customer
                         </th>
-                        <th rowSpan={2} className="w-80 p-2 text-left text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                        <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           Item
                         </th>
-                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           BUD<br/>25
                         </th>
-                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           YTD<br/>25
                         </th>
-                        <th className="w-20 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           FORECAST
                         </th>
-                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           STOCK
                         </th>
-                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                           GIT
                         </th>
-                        <th className="w-16 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">
+                        <th className="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           ETA
                         </th>
-                        {months.map((month, index) => (
-                          <th key={index} className={`w-12 p-1 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300 ${
-                            month.isPast ? 'bg-gray-200' :
-                            month.isCurrent ? 'bg-orange-300' :
-                            'bg-green-50'
-                          }`}>
-                            {month.short}
-                          </th>
-                        ))}
-                      </tr>
-                      {/* Row 2: Sub headers and month year labels */}
-                      <tr className="border-b border-gray-300">
-                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300">25</td>
-                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300">25</td>
-                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300">26</td>
-                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300"></td>
-                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300"></td>
-                        <td className="p-1 text-center text-xs text-gray-500 border-r border-gray-300"></td>
-                        {months.map((month, index) => (
-                          <td key={index} className={`p-1 text-center text-xs text-gray-500 border-r border-gray-300 ${
-                            month.isPast ? 'bg-gray-200' :
-                            month.isCurrent ? 'bg-orange-300' :
-                            'bg-green-50'
-                          }`}>
-                            2024
-                          </td>
-                        ))}
                       </tr>
                     </thead>
-
-                    <tbody>
-                      {/* Budget Row (Orange highlighted) */}
-                      <tr className="bg-orange-400 text-white font-semibold">
-                        <td className="p-2 border-r border-gray-300">BUD 2026</td>
-                        <td className="p-2 border-r border-gray-300"></td>
-                        <td className="p-1 text-center border-r border-gray-300"></td>
-                        <td className="p-1 text-center border-r border-gray-300"></td>
-                        <td className="p-1 text-center border-r border-gray-300"></td>
-                        <td className="p-1 text-center border-r border-gray-300"></td>
-                        <td className="p-1 text-center border-r border-gray-300"></td>
-                        <td className="p-1 text-center border-r border-gray-300"></td>
-                        {months.map((month, index) => (
-                          <td key={index} className="p-1 text-center border-r border-gray-300">
-                            {/* Budget values could be added here */}
-                          </td>
-                        ))}
-                      </tr>
-
-                      {/* ACT 2026 Row */}
-                      <tr className="bg-blue-100">
-                        <td className="p-2 border-r border-gray-300 font-medium">ACT 2026</td>
-                        <td className="p-2 border-r border-gray-300"></td>
-                        <td className="p-1 text-center border-r border-gray-300">0</td>
-                        <td className="p-1 text-center border-r border-gray-300">0</td>
-                        <td className="p-1 text-center border-r border-gray-300">0</td>
-                        <td className="p-1 text-center border-r border-gray-300">0</td>
-                        <td className="p-1 text-center border-r border-gray-300">0</td>
-                        <td className="p-1 text-center border-r border-gray-300">0</td>
-                        {months.map((month, index) => (
-                          <td key={index} className={`p-1 text-center border-r border-gray-300 ${
-                            month.isPast ? 'bg-gray-100' :
-                            month.isCurrent ? 'bg-orange-100' :
-                            'bg-white'
-                          }`}>
-                            0
-                          </td>
-                        ))}
-                      </tr>
-
-                      {/* Data Rows */}
+                    <tbody className="bg-white divide-y divide-gray-200">
                       {tableData.map((row, rowIndex) => (
-                        <tr key={row.id} className={`hover:bg-gray-50 ${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
-                          <td className="p-2 border-r border-gray-300 text-xs">
-                            <div className="truncate" title={row.customer}>
+                        <tr key={row.id} className="hover:bg-gray-50">
+                          <td className="p-3 border-r border-gray-200 text-xs">
+                            <div className="text-gray-900 font-medium">
                               {row.customer}
                             </div>
                           </td>
-                          <td className="p-2 border-r border-gray-300 text-xs">
-                            <div className="truncate max-w-xs" title={row.item}>
+                          <td className="p-3 border-r border-gray-200 text-xs">
+                            <div className="text-gray-900" title={row.item}>
                               {row.item}
                             </div>
                           </td>
-                          <td className="p-1 text-center border-r border-gray-300 text-xs">
-                            {Math.round(row.budget2025 / 1000)}
+                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
+                            0
                           </td>
-                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
                             {row.ytd2025}
                           </td>
-                          <td className="p-1 text-center border-r border-gray-300 text-xs">
-                            {row.forecast2025}
+                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
+                            0
                           </td>
-                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
                             {row.stock}
                           </td>
-                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                          <td className="p-3 text-center border-r border-gray-200 text-xs text-gray-900">
                             {row.git}
                           </td>
-                          <td className="p-1 text-center border-r border-gray-300 text-xs">
+                          <td className="p-3 text-center text-xs">
                             <div className="flex items-center justify-center">
-                              <div className={`w-2 h-2 rounded-full mr-1 ${
-                                new Date(row.eta) > new Date() ? 'bg-green-500' : 'bg-red-500'
+                              <div className={`w-2 h-2 rounded-full ${
+                                row.stock > 0 ? 'bg-green-500' :
+                                row.git > 0 ? 'bg-red-500' :
+                                'bg-green-500'
                               }`}></div>
-                              {new Date(row.eta).getDate()}
+                              {row.eta && (
+                                <span className="ml-1 text-gray-600 text-xs">
+                                  {row.eta.split('-')[2]}-{row.eta.split('-')[1].substring(0, 2)}
+                                </span>
+                              )}
                             </div>
                           </td>
-                          {months.map((month, monthIndex) => (
-                            <td key={monthIndex} className={`p-1 text-center border-r border-gray-300 ${
-                              month.isPast ? 'bg-gray-100 text-gray-400' :
-                              month.isCurrent ? 'bg-orange-100' :
-                              'bg-white'
-                            }`}>
-                              {month.isFuture ? (
-                                <input
-                                  type="number"
-                                  className="w-full text-center border-0 bg-transparent focus:bg-blue-50 focus:ring-1 focus:ring-blue-500 rounded text-xs p-1"
-                                  placeholder="0"
-                                  value={row.monthlyUnits[monthIndex] || ''}
-                                  onChange={(e) => {
-                                    const value = parseInt(e.target.value) || 0;
-                                    setTableData(prev => prev.map(item =>
-                                      item.id === row.id ? {
-                                        ...item,
-                                        monthlyUnits: { ...item.monthlyUnits, [monthIndex]: value }
-                                      } : item
-                                    ));
-                                  }}
-                                  min="0"
-                                />
-                              ) : (
-                                <span className="text-gray-400">0</span>
-                              )}
-                            </td>
-                          ))}
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               )}
-            </div>
-
-            {/* Submit Button */}
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => {
-                  showNotification('Forecast data submitted successfully!', 'success');
-                }}
-                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold"
-              >
-                Submit
-              </button>
             </div>
           </div>
         </div>
