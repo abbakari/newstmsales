@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import RoleBasedRoleBasedLayout from '../components/RoleBasedRoleBasedLayout';
+import RoleBasedLayout from '../components/RoleBasedLayout';
 import {
   Search,
   Bell,
