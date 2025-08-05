@@ -5,11 +5,9 @@ import { useRole } from '../contexts/RoleContext';
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useRole();
-  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    remember: false
+    password: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,103 +31,61 @@ const Login: React.FC = () => {
     }
   };
 
-  const togglePassword = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-2xl w-96">
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">STM Budget Login</h1>
-        <div className="w-full max-w-sm">
-          <div className="mb-6 text-center">
-            <img src="/assets/images/superdoll_logo.jpeg" alt="Logo" className="w-48 mx-auto lg:hidden mb-4" />
-            <h4 className="text-xl font-semibold">Welcome to Sales Budgeting & Rolling Forecast</h4>
-            <p className="text-gray-600 mt-2">Please sign-in to your account</p>
+        
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+              autoFocus
+            />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="email">Email Address</label>
-              <input
-                type="email"
-                id="email"
-                className="w-full border border-gray-300 rounded px-4 py-2"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                autoComplete="email"
-                autoFocus
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="password">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  className="w-full border border-gray-300 rounded px-4 py-2"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                  autoComplete="current-password"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" onClick={togglePassword}>
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center">
-              <input 
-                type="checkbox" 
-                id="remember" 
-                className="mr-2" 
-                checked={formData.remember}
-                onChange={(e) => setFormData({ ...formData, remember: e.target.checked })}
-              />
-              <label htmlFor="remember" className="text-sm">Remember Me</label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
-            >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
-            {error && (
-              <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
-            )}
-          </form>
-
-          <div className="mt-6 text-center">
-            <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-4">
-              <p className="text-sm font-medium text-blue-800 mb-2">Demo Login Credentials:</p>
-              <div className="space-y-1">
-                <p className="text-xs text-blue-600">
-                  <span className="font-medium">🛡️ Admin:</span> admin@company.com / admin123
-                </p>
-                <p className="text-xs text-blue-600">
-                  <span className="font-medium">📊 Salesman:</span> salesman@company.com / password
-                </p>
-                <p className="text-xs text-blue-600">
-                  <span className="font-medium">✅ Manager:</span> manager@company.com / password
-                </p>
-                <p className="text-xs text-blue-600">
-                  <span className="font-medium">🚚 Supply Chain:</span> supply@company.com / password
-                </p>
-              </div>
-            </div>
-            <img
-              src="/assets/images/superdoll_logo.jpeg"
-              width="70"
-              alt="STM Logo"
-              className="h-8 mx-auto"
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
             />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+
+        <div className="mt-6 p-4 bg-gray-50 rounded">
+          <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Accounts:</h3>
+          <div className="text-xs text-gray-600 space-y-1">
+            <div><strong>Admin:</strong> admin@company.com / admin123</div>
+            <div><strong>Manager:</strong> manager@company.com / password</div>
+            <div><strong>Salesman:</strong> salesman@company.com / password</div>
+            <div><strong>Supply Chain:</strong> supply@company.com / password</div>
           </div>
         </div>
       </div>
