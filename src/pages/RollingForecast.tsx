@@ -468,7 +468,7 @@ const RollingForecast: React.FC = () => {
                   {currentUser?.role === 'salesman' && '📊 Sales Forecast Dashboard'}
                   {currentUser?.role === 'manager' && '✅ Manager Approval Dashboard'}
                   {currentUser?.role === 'supply_chain' && '🚚 Supply Chain Management Dashboard'}
-                  {currentUser?.role === 'admin' && '🛡️ Admin Control Panel'}
+                  {currentUser?.role === 'admin' && '��️ Admin Control Panel'}
                 </span>
               </div>
             </div>
@@ -483,7 +483,8 @@ const RollingForecast: React.FC = () => {
                 <div className={`px-3 py-1 rounded-full text-xs font-medium ${
                   currentUser?.role === 'salesman' ? 'bg-blue-100 text-blue-800' :
                   currentUser?.role === 'manager' ? 'bg-green-100 text-green-800' :
-                  'bg-purple-100 text-purple-800'
+                  currentUser?.role === 'supply_chain' ? 'bg-purple-100 text-purple-800' :
+                  'bg-red-100 text-red-800'
                 }`}>
                   {currentUser?.role.replace('_', ' ').toUpperCase()}
                 </div>
@@ -658,7 +659,7 @@ const RollingForecast: React.FC = () => {
               {/* Year Selectors */}
               <div className="bg-white p-3 rounded-lg shadow-sm border-2 border-indigo-400">
                 <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
-                  ���� YEARS:
+                  📅 YEARS:
                 </label>
                 <div className="flex gap-1">
                   <select
