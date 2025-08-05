@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { RoleProvider } from './contexts/RoleContext';
 import Login from './pages/Login';
 import RollingForecast from './pages/RollingForecast';
-import Dashboard from './pages/Dashboard';
+import DashboardRoleWrapper from './pages/DashboardRoleWrapper';
 import BiDashboard from './pages/BiDashboard';
 import SalesBudget from './pages/SalesBudget';
 import UserManagement from './pages/UserManagement';
