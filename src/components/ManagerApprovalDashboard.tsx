@@ -296,12 +296,57 @@ const ManagerApprovalDashboard: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Forecast Data</label>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <pre className="text-sm text-gray-800">
-                    {JSON.stringify(selectedApproval.forecastData, null, 2)}
-                  </pre>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Forecast Data {isEditing && <span className="text-orange-600">(Editing Mode)</span>}
+                </label>
+                {isEditing ? (
+                  <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                    <h4 className="text-sm font-medium text-gray-900 mb-3">Monthly Forecast (Units)</h4>
+                    <div className="grid grid-cols-3 gap-3">
+                      {Object.entries(editedForecastData?.budget2026 || {}).map(([month, value]: [string, any]) => (
+                        <div key={month}>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">{month}</label>
+                          <input
+                            type="number"
+                            value={value || ''}
+                            onChange={(e) => updateForecastValue(month, parseInt(e.target.value) || 0)}
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            min="0"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-orange-200">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="font-medium">Total Units:</span> {editedForecastData?.totalUnits || 0}
+                        </div>
+                        <div>
+                          <span className="font-medium">Total Value:</span> ${(editedForecastData?.totalValue || 0).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-medium">Total Units:</span> {selectedApproval.forecastData?.totalUnits || 0}
+                      </div>
+                      <div>
+                        <span className="font-medium">Total Value:</span> ${(selectedApproval.forecastData?.totalValue || 0).toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <span className="font-medium">Monthly Breakdown:</span>
+                      <div className="mt-1 text-xs text-gray-600">
+                        {Object.entries(selectedApproval.forecastData?.budget2026 || {}).map(([month, value]: [string, any]) =>
+                          `${month}: ${value} units`
+                        ).join(', ')}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
