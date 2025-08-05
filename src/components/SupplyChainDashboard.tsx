@@ -54,6 +54,44 @@ const SupplyChainDashboard: React.FC = () => {
     });
   }, [supplyChainApprovals]);
 
+  const updateStepStatus = (taskId: string, stepId: string, status: 'pending' | 'in_progress' | 'completed') => {
+    setTasks(prev => prev.map(task => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          processingSteps: task.processingSteps.map(step =>
+            step.id === stepId
+              ? {
+                  ...step,
+                  status,
+                  completedAt: status === 'completed' ? new Date().toISOString() : undefined,
+                  assignedTo: status === 'in_progress' ? currentUser?.name : step.assignedTo
+                }
+              : step
+          )
+        };
+      }
+      return task;
+    }));
+  };
+
+  const updateTaskPriority = (taskId: string, priority: 'low' | 'medium' | 'high') => {
+    setTasks(prev => prev.map(task =>
+      task.id === taskId ? { ...task, priority } : task
+    ));
+  };
+
+  const addTaskNotes = (taskId: string, notes: string) => {
+    setTasks(prev => prev.map(task =>
+      task.id === taskId ? { ...task, notes: task.notes + '\n' + notes } : task
+    ));
+  };
+
+  const getTaskProgress = (task: SupplyChainTask) => {
+    const completedSteps = task.processingSteps.filter(step => step.status === 'completed').length;
+    return (completedSteps / task.processingSteps.length) * 100;
+  };
+
   const updateProcessingStep = (taskId: string, stepId: string, status: ProcessingStep['status']) => {
     setTasks(prev => prev.map(task => {
       if (task.id === taskId) {
