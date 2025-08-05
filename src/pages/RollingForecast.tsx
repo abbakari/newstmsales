@@ -646,7 +646,7 @@ const RollingForecast: React.FC = () => {
             {/* Action Buttons Row */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
               <button
-                onClick={() => showNotification('New Addition feature opened', 'success')}
+                onClick={() => setIsNewAdditionModalOpen(true)}
                 className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
