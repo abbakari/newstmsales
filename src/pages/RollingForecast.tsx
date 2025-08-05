@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import Layout from '../components/Layout';
+import RoleBasedLayout from '../components/RoleBasedLayout';
 import RoleDashboard from '../components/RoleDashboard';
 import { useRole } from '../contexts/RoleContext';
 
