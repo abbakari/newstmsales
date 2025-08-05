@@ -1,18 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
 import { RoleProvider } from './contexts/RoleContext';
-import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import SalesBudget from './pages/SalesBudget';
 import RollingForecast from './pages/RollingForecast';
-import DistributionManagement from './pages/DistributionManagement';
-import UserManagement from './pages/UserManagement';
-import InventoryManagement from './pages/InventoryManagement';
-import DataSources from './pages/DataSources';
-import BiDashboard from './pages/BiDashboard';
-import { UserType } from './types/auth';
 import './index.css';
 
 function App() {
