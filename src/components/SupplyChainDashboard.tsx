@@ -292,15 +292,36 @@ const SupplyChainDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div className="text-sm text-gray-600">
                     <div className="flex items-center gap-2 mb-1">
                       <Package className="w-4 h-4" />
-                      <span>{task.approval.item}</span>
+                      <span className="font-medium">Item:</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <p className="text-xs text-gray-800 ml-6">{task.approval.item}</p>
+                    <div className="flex items-center gap-2 mt-2">
                       <Calendar className="w-4 h-4" />
                       <span>Received: {new Date(task.approval.reviewedAt || task.approval.submittedAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="text-sm">
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <h4 className="font-medium text-blue-900 mb-2">Forecast Details</h4>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between">
+                          <span>Total Units:</span>
+                          <span className="font-medium">{task.approval.forecastData?.totalUnits || 0}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Total Value:</span>
+                          <span className="font-medium">${(task.approval.forecastData?.totalValue || 0).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Approved by:</span>
+                          <span className="font-medium">{task.approval.reviewedBy}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
