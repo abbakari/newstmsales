@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import RoleBasedLayout from '../components/RoleBasedLayout';
 import RoleDashboard from '../components/RoleDashboard';
 import { useRole } from '../contexts/RoleContext';
+import { BarChart3, PieChart, TrendingUp, Users, Package, Settings, Database, Grid } from 'lucide-react';
 
 const RollingForecast: React.FC = () => {
   const { currentUser, logout } = useRole();
