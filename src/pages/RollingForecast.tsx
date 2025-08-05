@@ -296,6 +296,64 @@ const RollingForecast: React.FC = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
+  // Handle New Addition
+  const handleNewAddition = (data: NewAdditionData) => {
+    if (!canCreateForecast()) {
+      showNotification('Access denied. Insufficient permissions.', 'error');
+      return;
+    }
+
+    // Add new customer/item combination to the table
+    const newId = Math.max(...originalTableData.map(item => item.id)) + 1;
+    const newRow: ForecastItem = {
+      id: newId,
+      selected: false,
+      customer: data.type === 'new_customer' ? data.customerName! : 'Existing Customer',
+      item: 'New Item',
+      category: 'General',
+      brand: 'Generic',
+      itemCombined: 'New Item (General - Generic)',
+      budget2025: 0,
+      ytd2025: 0,
+      forecast2025: 0,
+      stock: 0,
+      git: 0,
+      eta: '',
+      monthlyUnits: {}
+    };
+
+    setOriginalTableData(prev => [...prev, newRow]);
+    showNotification(
+      `New ${data.type === 'new_customer' ? 'customer' : 'item'} added successfully!`,
+      'success'
+    );
+  };
+
+  // Submit forecast for approval (for salesman role)
+  const handleSubmitForApproval = (rowId: number) => {
+    if (!canCreateForecast()) {
+      showNotification('Access denied. Only salesmen can submit forecasts.', 'error');
+      return;
+    }
+
+    const row = tableData.find(item => item.id === rowId);
+    const forecast = forecastData[rowId];
+
+    if (row && forecast) {
+      const submissionData = {
+        id: `forecast_${rowId}_${Date.now()}`,
+        customerId: rowId.toString(),
+        customerName: row.customer,
+        item: row.item,
+        forecastData: forecast,
+        submittedBy: currentUser?.name || 'Unknown'
+      };
+
+      submitForApproval(submissionData);
+      showNotification(`Forecast submitted for approval: ${row.customer}`, 'success');
+    }
+  };
+
   const handleDownloadForecast = () => {
     const fileName = `rolling_forecast_${selectedYear2026}.csv`;
     showNotification(`Preparing download for ${selectedYear2026}...`, 'success');
