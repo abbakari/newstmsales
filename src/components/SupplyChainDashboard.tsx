@@ -113,11 +113,7 @@ const SupplyChainDashboard: React.FC = () => {
     }));
   };
 
-  const updateTaskPriority = (taskId: string, priority: SupplyChainTask['priority']) => {
-    setTasks(prev => prev.map(task => 
-      task.id === taskId ? { ...task, priority } : task
-    ));
-  };
+
 
   const addTaskNotes = (taskId: string, notes: string) => {
     setTasks(prev => prev.map(task => 
