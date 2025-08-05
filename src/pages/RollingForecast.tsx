@@ -36,9 +36,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import CustomerForecastModal from '../components/CustomerForecastModal';
-import NewAdditionModal, { NewAdditionData } from '../components/NewAdditionModal';
-import ManagerApprovalDashboard from '../components/ManagerApprovalDashboard';
-import SupplyChainDashboard from '../components/SupplyChainDashboard';
+import RoleDashboard from '../components/RoleDashboard';
 import { Customer, Item, CustomerItemForecast, ForecastFormData, MonthlyForecast } from '../types/forecast';
 import { formatCurrency, formatPercentage } from '../utils/budgetCalculations';
 import { useRole } from '../contexts/RoleContext';
