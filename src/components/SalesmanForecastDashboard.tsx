@@ -308,11 +308,14 @@ const SalesmanForecastDashboard: React.FC = () => {
                   </td>
                   <td className="p-3 text-center">
                     <button
-                      onClick={() => handleSubmitForApproval(row.id)}
+                      onClick={() => {
+                        setEditingItem(row);
+                        setForecastData({});
+                      }}
                       className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-full transition-all duration-200 transform hover:scale-110"
-                      title="Submit forecast for manager approval"
+                      title="Edit forecast for this customer"
                     >
-                      <Users className="w-4 h-4" />
+                      <Edit className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
