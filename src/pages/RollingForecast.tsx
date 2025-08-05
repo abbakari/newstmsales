@@ -455,7 +455,63 @@ const RollingForecast: React.FC = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gray-100 font-sans">
+        {/* Role Navigation Header */}
+        <div className="bg-white border-b border-gray-200 m-4 mb-0 rounded-t-lg">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                <span className="text-lg font-semibold text-gray-900">
+                  {currentUser?.name} - {currentUser?.role.replace('_', ' ').toUpperCase()} Dashboard
+                </span>
+              </div>
+            </div>
 
+            {/* Role Switching Buttons */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600 mr-2">Switch Role:</span>
+              <button
+                onClick={() => {
+                  switchRole('salesman');
+                  setActiveView('forecast');
+                }}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  currentUser?.role === 'salesman'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                📊 Salesman
+              </button>
+              <button
+                onClick={() => {
+                  switchRole('manager');
+                  setActiveView('manager');
+                }}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  currentUser?.role === 'manager'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                ✅ Manager
+              </button>
+              <button
+                onClick={() => {
+                  switchRole('supply_chain');
+                  setActiveView('supply_chain');
+                }}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  currentUser?.role === 'supply_chain'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                🚚 Supply Chain
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* Main Content Container */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 m-4 overflow-hidden">
