@@ -93,6 +93,60 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const savedApprovals = localStorage.getItem('pendingApprovals');
     if (savedApprovals) {
       setPendingApprovals(JSON.parse(savedApprovals));
+    } else {
+      // Initialize with sample approval data for demonstration
+      const sampleApprovals: ForecastApproval[] = [
+        {
+          id: 'approval_001',
+          forecastId: 'forecast_001',
+          customerId: '1',
+          customerName: 'Action Aid International (Tz)',
+          item: 'BF GOODRICH TYRE 235/85R16 120/116S TL AT/TA KO2 LRERWLGO',
+          forecastData: {
+            budget2026: { 'DEC': 50, 'JAN': 75, 'FEB': 100 },
+            totalUnits: 225,
+            totalValue: 112500
+          },
+          submittedBy: 'John Salesman',
+          submittedAt: new Date().toISOString(),
+          status: 'pending'
+        },
+        {
+          id: 'approval_002',
+          forecastId: 'forecast_002',
+          customerId: '2',
+          customerName: 'ADVENT CONSTRUCTION LTD',
+          item: 'BF GOODRICH TYRE 265/65R17 120/117S TL AT/TA KO2 LRERWLGO',
+          forecastData: {
+            budget2026: { 'DEC': 30, 'JAN': 45, 'FEB': 60 },
+            totalUnits: 135,
+            totalValue: 67500
+          },
+          submittedBy: 'John Salesman',
+          submittedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+          status: 'approved',
+          reviewedBy: 'Sarah Manager',
+          reviewedAt: new Date().toISOString(),
+          comments: 'Approved - looks good for Q1 planning'
+        },
+        {
+          id: 'approval_003',
+          forecastId: 'forecast_003',
+          customerId: '3',
+          customerName: 'European Systems Ltd',
+          item: 'MICHELIN TYRE 265/65R17 112T TL LTX TRAIL',
+          forecastData: {
+            budget2026: { 'NOV': 25, 'DEC': 40, 'JAN': 55 },
+            totalUnits: 120,
+            totalValue: 60000
+          },
+          submittedBy: 'John Salesman',
+          submittedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+          status: 'pending'
+        }
+      ];
+      setPendingApprovals(sampleApprovals);
+      localStorage.setItem('pendingApprovals', JSON.stringify(sampleApprovals));
     }
   }, []);
 
