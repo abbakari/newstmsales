@@ -24,6 +24,7 @@ const SupplyChainDashboard: React.FC = () => {
   const [tasks, setTasks] = useState<SupplyChainTask[]>([]);
   const [selectedTask, setSelectedTask] = useState<SupplyChainTask | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'in_progress' | 'completed'>('pending');
+  const [processingNotes, setProcessingNotes] = useState('');
 
   // Get approved forecasts that have been sent to supply chain
   const supplyChainApprovals = pendingApprovals.filter(approval => 
