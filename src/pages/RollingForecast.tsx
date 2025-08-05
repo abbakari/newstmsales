@@ -441,6 +441,17 @@ const RollingForecast: React.FC = () => {
   const totalStock = tableData.reduce((sum, item) => sum + item.stock, 0);
   const totalGIT = tableData.reduce((sum, item) => sum + item.git, 0);
 
+  // Set activeView based on user role when role changes
+  useEffect(() => {
+    if (currentUser?.role === 'manager') {
+      setActiveView('manager');
+    } else if (currentUser?.role === 'supply_chain') {
+      setActiveView('supply_chain');
+    } else {
+      setActiveView('forecast');
+    }
+  }, [currentUser?.role]);
+
   return (
     <Layout>
       <div className="min-h-screen bg-gray-100 font-sans">
