@@ -1106,6 +1106,13 @@ const RollingForecast: React.FC = () => {
           onSaveForecast={() => {}}
           existingForecast={null}
         />
+
+        {/* New Addition Modal */}
+        <NewAdditionModal
+          isOpen={isNewAdditionModalOpen}
+          onClose={() => setIsNewAdditionModalOpen(false)}
+          onSave={handleNewAddition}
+        />
       </div>
     </Layout>
   );
