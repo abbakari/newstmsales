@@ -455,59 +455,49 @@ const RollingForecast: React.FC = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gray-100 font-sans">
-        {/* Role Navigation Header */}
+        {/* User Dashboard Header */}
         <div className="bg-white border-b border-gray-200 m-4 mb-0 rounded-t-lg">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                <div className={`w-3 h-3 rounded-full ${
+                  currentUser?.role === 'salesman' ? 'bg-blue-600' :
+                  currentUser?.role === 'manager' ? 'bg-green-600' :
+                  'bg-purple-600'
+                }`}></div>
                 <span className="text-lg font-semibold text-gray-900">
-                  {currentUser?.name} - {currentUser?.role.replace('_', ' ').toUpperCase()} Dashboard
+                  {currentUser?.role === 'salesman' && '📊 Sales Forecast Dashboard'}
+                  {currentUser?.role === 'manager' && '✅ Manager Approval Dashboard'}
+                  {currentUser?.role === 'supply_chain' && '🚚 Supply Chain Management Dashboard'}
                 </span>
               </div>
             </div>
 
-            {/* Role Switching Buttons */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 mr-2">Switch Role:</span>
+            {/* User Information and Logout */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="text-right">
+                  <div className="text-sm font-medium text-gray-900">{currentUser?.name}</div>
+                  <div className="text-xs text-gray-500">{currentUser?.department}</div>
+                </div>
+                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  currentUser?.role === 'salesman' ? 'bg-blue-100 text-blue-800' :
+                  currentUser?.role === 'manager' ? 'bg-green-100 text-green-800' :
+                  'bg-purple-100 text-purple-800'
+                }`}>
+                  {currentUser?.role.replace('_', ' ').toUpperCase()}
+                </div>
+              </div>
               <button
                 onClick={() => {
-                  switchRole('salesman');
-                  setActiveView('forecast');
+                  if (confirm('Are you sure you want to logout?')) {
+                    logout();
+                    window.location.href = '/login';
+                  }
                 }}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  currentUser?.role === 'salesman'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200 transition-colors"
               >
-                📊 Salesman
-              </button>
-              <button
-                onClick={() => {
-                  switchRole('manager');
-                  setActiveView('manager');
-                }}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  currentUser?.role === 'manager'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                ✅ Manager
-              </button>
-              <button
-                onClick={() => {
-                  switchRole('supply_chain');
-                  setActiveView('supply_chain');
-                }}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  currentUser?.role === 'supply_chain'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                🚚 Supply Chain
+                Logout
               </button>
             </div>
           </div>
