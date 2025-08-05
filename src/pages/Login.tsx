@@ -40,12 +40,6 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Debug message */}
-      <div className="w-full bg-blue-500 text-white text-center p-8">
-        <h1 className="text-4xl font-bold">DEBUG: Login Page Loading</h1>
-        <p>If you can see this, React is working!</p>
-      </div>
-
       {/* Left Image Section */}
       <div className="hidden lg:flex w-1/2 bg-yellow-500 justify-center items-center p-8">
         <img src="/assets/images/superdoll_logo.jpeg" alt="Login visual" className="w-[500px]" />
