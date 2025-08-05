@@ -16,6 +16,8 @@ const RoleDashboard: React.FC = () => {
 
   // Render appropriate dashboard based on user role
   switch (currentUser.role) {
+    case 'admin':
+      return <AdminDashboard />;
     case 'manager':
       return <ManagerApprovalDashboard />;
     case 'supply_chain':
