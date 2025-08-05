@@ -164,10 +164,11 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     // Demo login - in real app this would call an API
-    const user = sampleUsers.find(u => u.email === email);
+    const user = sampleUsers.find(u => u.email === email && u.password === password);
     if (user) {
-      setCurrentUser(user);
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      const { password: _, ...userWithoutPassword } = user; // Remove password from stored user
+      setCurrentUser(userWithoutPassword);
+      localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
       return true;
     }
     return false;
