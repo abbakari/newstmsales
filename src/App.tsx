@@ -25,14 +25,14 @@ function App() {
 
           {/* Comprehensive Dashboard Routes */}
           <Route path="/dashboard" element={<DashboardRoleWrapper />} />
-          <Route path="/bi-dashboard" element={<BiDashboard />} />
+          <Route path="/bi-dashboard" element={<BiDashboardWrapper />} />
           <Route path="/sales-budget" element={<SalesBudget />} />
 
           {/* Management and Admin Routes */}
-          <Route path="/user-management" element={<UserManagement />} />
-          <Route path="/data-sources" element={<DataSources />} />
-          <Route path="/inventory-management" element={<InventoryManagement />} />
-          <Route path="/distribution-management" element={<DistributionManagement />} />
+          <Route path="/user-management" element={<UserManagementWrapper />} />
+          <Route path="/data-sources" element={<DataSourcesWrapper />} />
+          <Route path="/inventory-management" element={<InventoryManagementWrapper />} />
+          <Route path="/distribution-management" element={<DistributionManagementWrapper />} />
 
           {/* Default redirect to main role-based dashboard */}
           <Route path="*" element={<RollingForecast />} />
