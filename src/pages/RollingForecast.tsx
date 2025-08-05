@@ -18,7 +18,7 @@ const RollingForecast: React.FC = () => {
   }
 
   return (
-    <Layout>
+    <RoleBasedLayout>
       <div className="min-h-screen bg-gray-100 font-sans">
         {/* User Dashboard Header */}
         <div className="bg-white border-b border-gray-200 m-4 mb-0 rounded-t-lg">
@@ -76,7 +76,7 @@ const RollingForecast: React.FC = () => {
           <RoleDashboard />
         </div>
       </div>
-    </Layout>
+    </RoleBasedLayout>
   );
 };
 
