@@ -7,6 +7,8 @@ const ManagerApprovalDashboard: React.FC = () => {
   const [selectedApproval, setSelectedApproval] = useState<ForecastApproval | null>(null);
   const [comments, setComments] = useState('');
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedForecastData, setEditedForecastData] = useState<any>(null);
 
   const filteredApprovals = pendingApprovals.filter(approval => {
     if (filter === 'all') return true;
