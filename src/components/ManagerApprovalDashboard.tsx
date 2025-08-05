@@ -16,9 +16,22 @@ const ManagerApprovalDashboard: React.FC = () => {
   });
 
   const handleApprove = (approvalId: string) => {
-    approveForecast(approvalId, comments);
+    // If edited, update the forecast data before approving
+    if (isEditing && editedForecastData) {
+      // Update the approval with edited data
+      const updatedApproval = {
+        ...selectedApproval!,
+        forecastData: editedForecastData,
+        comments: comments + ' (Updated by manager)'
+      };
+      approveForecast(approvalId, comments + ' (Forecast updated and approved)');
+    } else {
+      approveForecast(approvalId, comments);
+    }
     setComments('');
     setSelectedApproval(null);
+    setIsEditing(false);
+    setEditedForecastData(null);
   };
 
   const handleReject = (approvalId: string) => {
@@ -29,11 +42,33 @@ const ManagerApprovalDashboard: React.FC = () => {
     rejectForecast(approvalId, comments);
     setComments('');
     setSelectedApproval(null);
+    setIsEditing(false);
+    setEditedForecastData(null);
   };
 
   const handleSendToSupplyChain = (approvalId: string) => {
     sendToSupplyChain(approvalId);
     setSelectedApproval(null);
+  };
+
+  const handleEditForecast = (approval: ForecastApproval) => {
+    setSelectedApproval(approval);
+    setIsEditing(true);
+    setEditedForecastData({ ...approval.forecastData });
+  };
+
+  const updateForecastValue = (month: string, value: number) => {
+    if (editedForecastData) {
+      setEditedForecastData({
+        ...editedForecastData,
+        budget2026: {
+          ...editedForecastData.budget2026,
+          [month]: value
+        },
+        totalUnits: Object.values({ ...editedForecastData.budget2026, [month]: value }).reduce((sum: number, val: any) => sum + (val || 0), 0),
+        totalValue: Object.values({ ...editedForecastData.budget2026, [month]: value }).reduce((sum: number, val: any) => sum + (val || 0), 0) * 500 // Assuming avg price
+      });
+    }
   };
 
   const getStatusBadge = (status: string) => {
