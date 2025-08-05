@@ -67,7 +67,6 @@ const RollingForecast: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState('');
   const [selectedYear2025, setSelectedYear2025] = useState('2025');
   const [selectedYear2026, setSelectedYear2026] = useState('2026');
-  const [activeView, setActiveView] = useState('forecast-planning');
   const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
   const [editingRowId, setEditingRowId] = useState<number | null>(null);
 
