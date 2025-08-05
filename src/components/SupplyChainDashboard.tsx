@@ -444,14 +444,14 @@ const SupplyChainDashboard: React.FC = () => {
                         {step.status !== 'completed' && (
                           <>
                             <button
-                              onClick={() => updateProcessingStep(selectedTask.id, step.id, 'in_progress')}
+                              onClick={() => updateStepStatus(selectedTask.id, step.id, 'in_progress')}
                               disabled={step.status === 'in_progress'}
                               className="px-3 py-1 bg-blue-100 text-blue-800 rounded text-xs hover:bg-blue-200 disabled:opacity-50"
                             >
                               Start
                             </button>
                             <button
-                              onClick={() => updateProcessingStep(selectedTask.id, step.id, 'completed')}
+                              onClick={() => updateStepStatus(selectedTask.id, step.id, 'completed')}
                               className="px-3 py-1 bg-green-100 text-green-800 rounded text-xs hover:bg-green-200"
                             >
                               Complete
