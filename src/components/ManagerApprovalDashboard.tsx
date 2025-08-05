@@ -363,25 +363,62 @@ const ManagerApprovalDashboard: React.FC = () => {
 
             <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
               <button
-                onClick={() => setSelectedApproval(null)}
+                onClick={() => {
+                  setSelectedApproval(null);
+                  setIsEditing(false);
+                  setEditedForecastData(null);
+                }}
                 className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
-              <button
-                onClick={() => handleReject(selectedApproval.id)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-1"
-              >
-                <XCircle className="w-4 h-4" />
-                Reject
-              </button>
-              <button
-                onClick={() => handleApprove(selectedApproval.id)}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-1"
-              >
-                <CheckCircle className="w-4 h-4" />
-                Approve
-              </button>
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditedForecastData(null);
+                    }}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                  >
+                    Cancel Edit
+                  </button>
+                  <button
+                    onClick={() => handleApprove(selectedApproval.id)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-1"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Update & Approve
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      setIsEditing(true);
+                      setEditedForecastData({ ...selectedApproval.forecastData });
+                    }}
+                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-1"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Edit Forecast
+                  </button>
+                  <button
+                    onClick={() => handleReject(selectedApproval.id)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-1"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Reject
+                  </button>
+                  <button
+                    onClick={() => handleApprove(selectedApproval.id)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-1"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Approve
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
