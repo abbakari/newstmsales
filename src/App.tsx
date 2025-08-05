@@ -20,7 +20,19 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/rolling-forecast" element={<RollingForecast />} />
-          {/* Redirect any other routes to rolling forecast */}
+
+          {/* Comprehensive Dashboard Routes */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/bi-dashboard" element={<BiDashboard />} />
+          <Route path="/sales-budget" element={<SalesBudget />} />
+
+          {/* Management and Admin Routes */}
+          <Route path="/user-management" element={<UserManagement />} />
+          <Route path="/data-sources" element={<DataSources />} />
+          <Route path="/inventory-management" element={<InventoryManagement />} />
+          <Route path="/distribution-management" element={<DistributionManagement />} />
+
+          {/* Default redirect to main role-based dashboard */}
           <Route path="*" element={<RollingForecast />} />
         </Routes>
       </Router>
