@@ -369,14 +369,60 @@ const SupplyChainDashboard: React.FC = () => {
             
             <div className="p-6 space-y-6">
               {/* Task Details */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Customer</label>
-                  <p className="text-gray-900">{selectedTask.approval.customerName}</p>
+              <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Customer</label>
+                    <p className="text-gray-900 font-medium">{selectedTask.approval.customerName}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Submitted By</label>
+                    <p className="text-gray-900">{selectedTask.approval.submittedBy}</p>
+                  </div>
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Item</label>
-                  <p className="text-gray-900">{selectedTask.approval.item}</p>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Item Details</label>
+                  <p className="text-gray-900 text-sm bg-gray-50 p-3 rounded-lg">{selectedTask.approval.item}</p>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="text-lg font-medium text-blue-900 mb-3">Approved Forecast Details</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-700">{selectedTask.approval.forecastData?.totalUnits || 0}</div>
+                      <div className="text-sm text-blue-600">Total Units</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-700">${(selectedTask.approval.forecastData?.totalValue || 0).toLocaleString()}</div>
+                      <div className="text-sm text-green-600">Total Value</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-purple-700">{getTaskProgress(selectedTask).toFixed(0)}%</div>
+                      <div className="text-sm text-purple-600">Completed</div>
+                    </div>
+                  </div>
+
+                  {selectedTask.approval.forecastData?.budget2026 && (
+                    <div className="mt-4">
+                      <h5 className="text-sm font-medium text-blue-900 mb-2">Monthly Breakdown:</h5>
+                      <div className="grid grid-cols-6 gap-2 text-xs">
+                        {Object.entries(selectedTask.approval.forecastData.budget2026).map(([month, units]: [string, any]) => (
+                          <div key={month} className="text-center">
+                            <div className="font-medium">{month}</div>
+                            <div className="text-blue-700">{units} units</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedTask.approval.comments && (
+                    <div className="mt-4 p-3 bg-white rounded border">
+                      <div className="text-sm font-medium text-gray-700">Manager Comments:</div>
+                      <div className="text-sm text-gray-600 mt-1">{selectedTask.approval.comments}</div>
+                    </div>
+                  )}
                 </div>
               </div>
 
