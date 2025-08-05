@@ -38,14 +38,9 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Image Section */}
-      <div className="hidden lg:flex w-1/2 bg-yellow-500 justify-center items-center p-8">
-        <img src="/assets/images/superdoll_logo.jpeg" alt="Login visual" className="w-[500px]" />
-      </div>
-
-      {/* Right Form Section */}
-      <div className="flex w-full lg:w-1/2 justify-center items-center p-8 bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-lg shadow-2xl w-96">
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">STM Budget Login</h1>
         <div className="w-full max-w-sm">
           <div className="mb-6 text-center">
             <img src="/assets/images/superdoll_logo.jpeg" alt="Logo" className="w-48 mx-auto lg:hidden mb-4" />
