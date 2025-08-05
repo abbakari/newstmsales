@@ -73,9 +73,16 @@ const RollingForecast: React.FC = () => {
 
   // Modal states
   const [isForecastModalOpen, setIsForecastModalOpen] = useState(false);
+  const [isNewAdditionModalOpen, setIsNewAdditionModalOpen] = useState(false);
 
   // Notification state
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+
+  // Role-based access
+  const { currentUser, canCreateForecast, canEditBudget, submitForApproval, switchRole } = useRole();
+
+  // View mode for different roles
+  const [activeView, setActiveView] = useState<'forecast' | 'manager' | 'supply_chain'>('forecast');
 
   // GIT explanation state
   const [showGitExplanation, setShowGitExplanation] = useState(false);
