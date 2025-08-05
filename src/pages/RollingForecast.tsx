@@ -78,7 +78,7 @@ const RollingForecast: React.FC = () => {
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   // Role-based access
-  const { currentUser, canCreateForecast, canEditBudget, submitForApproval, switchRole } = useRole();
+  const { currentUser, canCreateForecast, canEditBudget, submitForApproval, logout } = useRole();
 
   // View mode for different roles
   const [activeView, setActiveView] = useState<'forecast' | 'manager' | 'supply_chain'>('forecast');
