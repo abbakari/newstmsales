@@ -4,12 +4,14 @@ import { RoleProvider } from './contexts/RoleContext';
 import Login from './pages/Login';
 import RollingForecast from './pages/RollingForecast';
 import DashboardRoleWrapper from './pages/DashboardRoleWrapper';
-import BiDashboard from './pages/BiDashboard';
 import SalesBudget from './pages/SalesBudget';
-import UserManagement from './pages/UserManagement';
-import DataSources from './pages/DataSources';
-import InventoryManagement from './pages/InventoryManagement';
-import DistributionManagement from './pages/DistributionManagement';
+import {
+  BiDashboardWrapper,
+  UserManagementWrapper,
+  DataSourcesWrapper,
+  InventoryManagementWrapper,
+  DistributionManagementWrapper
+} from './pages/RoleBasedPageWrapper';
 import './index.css';
 
 function App() {
