@@ -73,6 +73,30 @@ const SalesmanForecastDashboard: React.FC = () => {
 
   const [tableData, setTableData] = useState<ForecastItem[]>(initialData);
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+  const [editingItem, setEditingItem] = useState<ForecastItem | null>(null);
+  const [forecastData, setForecastData] = useState<{[monthIndex: number]: number}>({});
+
+  // Generate months for the year
+  const getAllYearMonths = () => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const months = [];
+
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(currentDate.getFullYear(), i, 1);
+      months.push({
+        short: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+        full: date.toLocaleDateString('en-US', { month: 'long' }),
+        index: i,
+        isPast: i < currentMonth,
+        isCurrent: i === currentMonth,
+        isFuture: i > currentMonth
+      });
+    }
+    return months;
+  };
+
+  const months = getAllYearMonths();
 
   const showNotification = (message: string, type: 'success' | 'error') => {
     setNotification({ message, type });
