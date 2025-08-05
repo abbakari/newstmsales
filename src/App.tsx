@@ -7,80 +7,17 @@ import './index.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <RoleProvider>
-        <Router>
+    <RoleProvider>
+      <Router>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route
-            path="/sales-budget"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.SALESMAN, UserType.MANAGER, UserType.BRANCH_MANAGER]}>
-                <SalesBudget />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/rolling-forecast"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.SALESMAN, UserType.MANAGER, UserType.BRANCH_MANAGER]}>
-                <RollingForecast />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/distribution-management"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.SUPPLY_CHAIN]}>
-                <DistributionManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/user-management"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN]}>
-                <UserManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/inventory-management"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.SUPPLY_CHAIN, UserType.MANAGER]}>
-                <InventoryManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/data-sources"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.MANAGER]}>
-                <DataSources />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/bi-dashboard"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.MANAGER, UserType.SALESMAN]}>
-                <BiDashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/rolling-forecast" element={<RollingForecast />} />
+          {/* Redirect any other routes to rolling forecast */}
+          <Route path="*" element={<RollingForecast />} />
         </Routes>
-        </Router>
-      </RoleProvider>
-    </AuthProvider>
+      </Router>
+    </RoleProvider>
   );
 }
 
