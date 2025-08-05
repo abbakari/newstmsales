@@ -18,7 +18,8 @@ import './index.css';
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <RoleProvider>
+        <Router>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
@@ -87,7 +88,8 @@ function App() {
             }
           />
         </Routes>
-      </Router>
+        </Router>
+      </RoleProvider>
     </AuthProvider>
   );
 }
