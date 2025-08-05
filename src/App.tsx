@@ -22,7 +22,7 @@ function App() {
           <Route path="/rolling-forecast" element={<RollingForecast />} />
 
           {/* Comprehensive Dashboard Routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<DashboardRoleWrapper />} />
           <Route path="/bi-dashboard" element={<BiDashboard />} />
           <Route path="/sales-budget" element={<SalesBudget />} />
 
