@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
+import RoleBasedLayout from '../components/RoleBasedLayout';
 import {
   Search,
   Bell,
@@ -552,7 +552,7 @@ const SalesBudget: React.FC = () => {
   const budgetGrowth = totalBudget2025 > 0 ? ((totalBudget2026 - totalBudget2025) / totalBudget2025) * 100 : 0;
 
   return (
-    <Layout>
+    <RoleBasedLayout>
       <div className="min-h-screen bg-gray-100 font-sans">
         {/* Main Content Container */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 m-4 overflow-hidden">
@@ -1386,7 +1386,7 @@ const SalesBudget: React.FC = () => {
           year={selectedYear2026}
         />
       </div>
-    </Layout>
+    </RoleBasedLayout>
   );
 };
 

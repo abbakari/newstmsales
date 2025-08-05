@@ -1,33 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useRole } from '../contexts/RoleContext';
 
-const Login: React.FC = () => {
-  const navigate = useNavigate();
-  const { login } = useRole();
+const LoginStandalone: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const success = await login(formData.email, formData.password);
-      if (success) {
-        navigate('/rolling-forecast');
-      } else {
-        setError('Invalid email or password');
-      }
-    } catch (err) {
-      setError('Login failed. Please try again.');
-    } finally {
-      setLoading(false);
+    
+    // Simple validation
+    if (formData.email === 'admin@company.com' && formData.password === 'admin123') {
+      alert('Login successful! (This is a demo)');
+      window.location.href = '/rolling-forecast';
+    } else {
+      setError('Invalid credentials. Try: admin@company.com / admin123');
     }
   };
 
@@ -72,20 +60,17 @@ const Login: React.FC = () => {
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            Sign In
           </button>
         </form>
 
         <div className="mt-6 p-4 bg-gray-50 rounded">
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Accounts:</h3>
-          <div className="text-xs text-gray-600 space-y-1">
-            <div><strong>Admin:</strong> admin@company.com / admin123</div>
-            <div><strong>Manager:</strong> manager@company.com / password</div>
-            <div><strong>Salesman:</strong> salesman@company.com / password</div>
-            <div><strong>Supply Chain:</strong> supply@company.com / password</div>
+          <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Account:</h3>
+          <div className="text-xs text-gray-600">
+            <div><strong>Email:</strong> admin@company.com</div>
+            <div><strong>Password:</strong> admin123</div>
           </div>
         </div>
       </div>
@@ -93,4 +78,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default LoginStandalone;

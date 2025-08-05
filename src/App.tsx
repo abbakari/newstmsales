@@ -1,93 +1,82 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import { RoleProvider } from './contexts/RoleContext';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import SalesBudget from './pages/SalesBudget';
+import LoginStandalone from './pages/LoginStandalone';
 import RollingForecast from './pages/RollingForecast';
-import DistributionManagement from './pages/DistributionManagement';
-import UserManagement from './pages/UserManagement';
-import InventoryManagement from './pages/InventoryManagement';
-import DataSources from './pages/DataSources';
-import BiDashboard from './pages/BiDashboard';
-import { UserType } from './types/auth';
+import DashboardRoleWrapper from './pages/DashboardRoleWrapper';
+import SalesBudget from './pages/SalesBudget';
+import {
+  BiDashboardWrapper,
+  UserManagementWrapper,
+  DataSourcesWrapper,
+  InventoryManagementWrapper,
+  DistributionManagementWrapper
+} from './pages/RoleBasedPageWrapper';
 import './index.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route
-            path="/sales-budget"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.SALESMAN, UserType.MANAGER, UserType.BRANCH_MANAGER]}>
-                <SalesBudget />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/rolling-forecast"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.SALESMAN, UserType.MANAGER, UserType.BRANCH_MANAGER]}>
-                <RollingForecast />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/distribution-management"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.SUPPLY_CHAIN]}>
-                <DistributionManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/user-management"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN]}>
-                <UserManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/inventory-management"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.SUPPLY_CHAIN, UserType.MANAGER]}>
-                <InventoryManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/data-sources"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.MANAGER]}>
-                <DataSources />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/bi-dashboard"
-            element={
-              <ProtectedRoute requiredUserTypes={[UserType.ADMIN, UserType.MANAGER, UserType.SALESMAN]}>
-                <BiDashboard />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginStandalone />} />
+        <Route path="/login" element={<LoginStandalone />} />
+
+        <Route path="/test-with-context" element={
+          <RoleProvider>
+            <Login />
+          </RoleProvider>
+        } />
+
+        <Route path="/rolling-forecast" element={
+          <RoleProvider>
+            <RollingForecast />
+          </RoleProvider>
+        } />
+
+        {/* Comprehensive Dashboard Routes */}
+        <Route path="/dashboard" element={
+          <RoleProvider>
+            <DashboardRoleWrapper />
+          </RoleProvider>
+        } />
+        <Route path="/bi-dashboard" element={
+          <RoleProvider>
+            <BiDashboardWrapper />
+          </RoleProvider>
+        } />
+        <Route path="/sales-budget" element={
+          <RoleProvider>
+            <SalesBudget />
+          </RoleProvider>
+        } />
+
+        {/* Management and Admin Routes */}
+        <Route path="/user-management" element={
+          <RoleProvider>
+            <UserManagementWrapper />
+          </RoleProvider>
+        } />
+        <Route path="/data-sources" element={
+          <RoleProvider>
+            <DataSourcesWrapper />
+          </RoleProvider>
+        } />
+        <Route path="/inventory-management" element={
+          <RoleProvider>
+            <InventoryManagementWrapper />
+          </RoleProvider>
+        } />
+        <Route path="/distribution-management" element={
+          <RoleProvider>
+            <DistributionManagementWrapper />
+          </RoleProvider>
+        } />
+
+        {/* Default redirect to login */}
+        <Route path="*" element={<LoginStandalone />} />
+      </Routes>
+    </Router>
   );
 }
 
