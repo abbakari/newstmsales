@@ -325,6 +325,152 @@ const SalesmanForecastDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Forecast Editing Modal */}
+      {editingItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl mx-4 max-h-[90vh] overflow-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Edit Forecast: {editingItem.customer}
+                </h3>
+                <button
+                  onClick={() => setEditingItem(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">{editingItem.item}</p>
+            </div>
+
+            <div className="p-6">
+              {/* Monthly Forecast Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border-collapse border border-gray-300">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase border border-gray-300 min-w-[100px]">
+                        MONTH
+                      </th>
+                      {months.map((month) => (
+                        <th key={month.index} className={`p-3 text-center text-xs font-medium text-gray-500 uppercase border border-gray-300 min-w-[80px] ${
+                          month.isPast ? 'bg-gray-200' :
+                          month.isCurrent ? 'bg-orange-200' :
+                          'bg-green-50'
+                        }`}>
+                          {month.short}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="p-3 font-medium text-gray-500 text-xs border border-gray-300">
+                        2024
+                      </td>
+                      {months.map((month) => (
+                        <td key={month.index} className="p-3 text-center border border-gray-300 text-xs text-gray-400">
+                          0
+                        </td>
+                      ))}
+                    </tr>
+
+                    {/* BUD 2025 Row - Yellow background, read-only */}
+                    <tr className="bg-yellow-300 text-black font-medium">
+                      <td className="p-3 border border-gray-300 text-xs">
+                        BUD 2025
+                      </td>
+                      {months.map((month) => (
+                        <td key={month.index} className="p-3 text-center border border-gray-300 text-xs">
+                          {/* Show existing budget values - read only */}
+                          {month.index < 6 ? Math.floor(editingItem.budget2025 / 12) : 0}
+                        </td>
+                      ))}
+                    </tr>
+
+                    {/* ACT 2025 Row - Editable for remaining months only */}
+                    <tr className="bg-blue-50">
+                      <td className="p-3 font-medium text-gray-800 border border-gray-300 text-xs">
+                        ACT 2025
+                      </td>
+                      {months.map((month) => (
+                        <td key={month.index} className={`p-1 text-center border border-gray-300 ${
+                          month.isPast ? 'bg-gray-100' :
+                          month.isCurrent ? 'bg-orange-100' :
+                          'bg-white'
+                        }`}>
+                          {month.isFuture ? (
+                            <input
+                              type="number"
+                              className="w-full text-center bg-white text-gray-900 border-0 rounded p-1 text-xs"
+                              placeholder="0"
+                              value={forecastData[month.index] || ''}
+                              onChange={(e) => setForecastData(prev => ({
+                                ...prev,
+                                [month.index]: parseInt(e.target.value) || 0
+                              }))}
+                              min="0"
+                            />
+                          ) : (
+                            <span className="text-xs text-gray-400">
+                              {month.isPast ? '0' : '0'}
+                            </span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Help Text */}
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <h4 className="text-sm font-medium text-blue-900 mb-2">Instructions:</h4>
+                <ul className="text-xs text-blue-800 space-y-1">
+                  <li>• <strong>BUD 2025 (Yellow):</strong> Shows existing budget values for comparison - cannot be edited</li>
+                  <li>• <strong>ACT 2025 (Blue):</strong> Enter your forecast for remaining months only</li>
+                  <li>• <strong>Past months:</strong> Cannot be edited (already completed)</li>
+                  <li>• <strong>Future months:</strong> Enter forecast values to help with planning</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+              <div className="text-sm text-gray-600">
+                Total Forecast: {Object.values(forecastData).reduce((sum, val) => sum + (val || 0), 0)} units
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setEditingItem(null)}
+                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // Save forecast and submit for approval
+                    const totalUnits = Object.values(forecastData).reduce((sum, val) => sum + (val || 0), 0);
+                    if (totalUnits > 0) {
+                      handleSubmitForApproval(editingItem.id);
+                      showNotification(`Forecast saved and submitted: ${totalUnits} units forecasted`, 'success');
+                      setEditingItem(null);
+                      setForecastData({});
+                    } else {
+                      showNotification('Please enter forecast values for at least one month', 'error');
+                    }
+                  }}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  Save & Submit for Approval
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Notification Toast */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ${
