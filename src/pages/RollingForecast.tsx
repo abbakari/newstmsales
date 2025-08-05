@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { 
-  Search, 
-  Download, 
-  Filter, 
-  Calendar, 
-  TrendingUp, 
-  BarChart3, 
-  Target, 
-  AlertCircle, 
-  Plus, 
-  Users, 
-  DollarSign, 
-  ShoppingCart, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  X, 
+import {
+  Search,
+  Download,
+  Filter,
+  Calendar,
+  TrendingUp,
+  BarChart3,
+  Target,
+  AlertCircle,
+  Plus,
+  Users,
+  DollarSign,
+  ShoppingCart,
+  Eye,
+  Edit,
+  Trash2,
+  X,
   Upload,
   Bell,
   ChevronDown,
@@ -31,11 +31,17 @@ import {
   Home,
   Grid,
   Minus,
-  Save
+  Save,
+  Shield,
+  UserCheck
 } from 'lucide-react';
 import CustomerForecastModal from '../components/CustomerForecastModal';
+import NewAdditionModal, { NewAdditionData } from '../components/NewAdditionModal';
+import ManagerApprovalDashboard from '../components/ManagerApprovalDashboard';
+import SupplyChainDashboard from '../components/SupplyChainDashboard';
 import { Customer, Item, CustomerItemForecast, ForecastFormData, MonthlyForecast } from '../types/forecast';
 import { formatCurrency, formatPercentage } from '../utils/budgetCalculations';
+import { useRole } from '../contexts/RoleContext';
 
 interface ForecastItem {
   id: number;
