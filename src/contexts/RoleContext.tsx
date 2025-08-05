@@ -48,12 +48,13 @@ interface RoleContextType {
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
-// Sample users for different roles
-const sampleUsers: User[] = [
+// Sample users for different roles with passwords
+const sampleUsers: (User & { password: string })[] = [
   {
     id: '1',
     name: 'John Salesman',
     email: 'salesman@company.com',
+    password: 'password',
     role: 'salesman',
     department: 'Sales',
     permissions: ['create_forecast', 'edit_budget', 'view_customers', 'manage_customers']
@@ -62,6 +63,7 @@ const sampleUsers: User[] = [
     id: '2',
     name: 'Sarah Manager',
     email: 'manager@company.com',
+    password: 'password',
     role: 'manager',
     department: 'Management',
     permissions: ['approve_forecast', 'view_all_forecasts', 'edit_approved_forecast', 'manage_team']
@@ -70,9 +72,19 @@ const sampleUsers: User[] = [
     id: '3',
     name: 'Mike Supply Chain',
     email: 'supply@company.com',
+    password: 'password',
     role: 'supply_chain',
     department: 'Supply Chain',
     permissions: ['process_approved_forecasts', 'manage_inventory', 'procurement']
+  },
+  {
+    id: '4',
+    name: 'Admin User',
+    email: 'admin@company.com',
+    password: 'admin123',
+    role: 'admin',
+    department: 'Administration',
+    permissions: ['create_forecast', 'edit_budget', 'view_customers', 'manage_customers', 'approve_forecast', 'view_all_forecasts', 'edit_approved_forecast', 'manage_team', 'process_approved_forecasts', 'manage_inventory', 'procurement', 'admin_access']
   }
 ];
 
