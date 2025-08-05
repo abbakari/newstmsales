@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle, XCircle, Clock, Send, MessageSquare, User, Calendar, Package } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Send, MessageSquare, User, Calendar, Package, Edit } from 'lucide-react';
 import { useRole, ForecastApproval } from '../contexts/RoleContext';
 
 const ManagerApprovalDashboard: React.FC = () => {
