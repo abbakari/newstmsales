@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRole } from '../contexts/RoleContext';
+import AdminDashboard from './AdminDashboard';
 import ManagerApprovalDashboard from './ManagerApprovalDashboard';
 import SupplyChainDashboard from './SupplyChainDashboard';
 import SalesmanForecastDashboard from './SalesmanForecastDashboard';
