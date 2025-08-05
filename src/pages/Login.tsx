@@ -5,7 +5,7 @@ import { useRole } from '../contexts/RoleContext';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login, loading, error: authError } = useAuth();
+  const { login } = useRole();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -13,20 +13,24 @@ const Login: React.FC = () => {
     remember: false
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
-      await login({
-        email: formData.email,
-        password: formData.password,
-        remember: formData.remember
-      });
-      navigate('/dashboard');
+      const success = await login(formData.email, formData.password);
+      if (success) {
+        navigate('/rolling-forecast');
+      } else {
+        setError('Invalid email or password');
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError('Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
