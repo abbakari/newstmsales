@@ -107,8 +107,8 @@ const Login: React.FC = () => {
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
-            {(error || authError) && (
-              <p className="text-red-500 text-sm mt-2 text-center">{error || authError}</p>
+            {error && (
+              <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
             )}
           </form>
 
