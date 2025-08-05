@@ -115,11 +115,7 @@ const SupplyChainDashboard: React.FC = () => {
 
 
 
-  const addTaskNotes = (taskId: string, notes: string) => {
-    setTasks(prev => prev.map(task => 
-      task.id === taskId ? { ...task, notes } : task
-    ));
-  };
+
 
   const getTaskStatus = (task: SupplyChainTask) => {
     const completedSteps = task.processingSteps.filter(step => step.status === 'completed').length;
